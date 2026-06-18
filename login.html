@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Đăng nhập - Học Từ Vựng Tiếng Đức</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  .card {
+    background: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    width: 100%;
+    max-width: 400px;
+    padding: 40px 32px;
+  }
+  .logo {
+    text-align: center;
+    font-size: 40px;
+    margin-bottom: 8px;
+  }
+  h1 {
+    text-align: center;
+    font-size: 22px;
+    color: #16213e;
+    margin: 0 0 4px;
+  }
+  .subtitle {
+    text-align: center;
+    color: #888;
+    font-size: 14px;
+    margin-bottom: 28px;
+  }
+  .field {
+    margin-bottom: 16px;
+  }
+  label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 6px;
+  }
+  input {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1.5px solid #e0e0e0;
+    border-radius: 10px;
+    font-size: 15px;
+    transition: border-color 0.2s;
+    outline: none;
+  }
+  input:focus {
+    border-color: #0f3460;
+  }
+  button.submit-btn {
+    width: 100%;
+    padding: 13px;
+    border: none;
+    border-radius: 10px;
+    background: #0f3460;
+    color: white;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 8px;
+    transition: background 0.2s, transform 0.1s;
+  }
+  button.submit-btn:hover { background: #16213e; }
+  button.submit-btn:active { transform: scale(0.98); }
+  button.submit-btn:disabled {
+    background: #aaa;
+    cursor: not-allowed;
+  }
+  .toggle-row {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 14px;
+    color: #555;
+  }
+  .toggle-link {
+    color: #0f3460;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: underline;
+  }
+  .message {
+    margin-top: 14px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    font-size: 13.5px;
+    display: none;
+    line-height: 1.4;
+  }
+  .message.error {
+    background: #fdecea;
+    color: #c0392b;
+    display: block;
+  }
+  .message.success {
+    background: #e8f8f0;
+    color: #1e7e4e;
+    display: block;
+  }
+  .forgot-row {
+    text-align: right;
+    margin-top: -6px;
+    margin-bottom: 14px;
+  }
+  .forgot-link {
+    font-size: 12.5px;
+    color: #888;
+    cursor: pointer;
+    text-decoration: underline;
+  }
+</style>
+</head>
+<body>
+
+<div class="card">
+  <div class="logo">🇩🇪</div>
+  <h1 id="formTitle">Đăng nhập</h1>
+  <p class="subtitle" id="formSubtitle">Học từ vựng tiếng Đức của riêng bạn</p>
+
+  <form id="authForm">
+    <div class="field">
+      <label for="email">Email</label>
+      <input type="email" id="email" placeholder="ban@example.com" required autocomplete="email">
+    </div>
+    <div class="field">
+      <label for="password">Mật khẩu</label>
+      <input type="password" id="password" placeholder="Tối thiểu 6 ký tự" required autocomplete="current-password" minlength="6">
+    </div>
+
+    <div class="forgot-row" id="forgotRow">
+      <span class="forgot-link" id="forgotLink">Quên mật khẩu?</span>
+    </div>
+
+    <button type="submit" class="submit-btn" id="submitBtn">Đăng nhập</button>
+  </form>
+
+  <div class="toggle-row">
+    <span id="toggleText">Chưa có tài khoản?</span>
+    <span class="toggle-link" id="toggleLink">Đăng ký ngay</span>
+  </div>
+
+  <div class="message" id="message"></div>
+</div>
+
+<!-- Firebase SDK -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import {
+    getAuth,
+    createUserWithEmailAndPassword,
+    signInWithEmailAndPassword,
+    sendPasswordResetEmail,
+    onAuthStateChanged
+  } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+  // ====== CẤU HÌNH FIREBASE CỦA BẠN ======
+  const firebaseConfig = {
+    apiKey: "AIzaSyA_0t95PFaeITktsCGnBQTF7pBD9Y9HhZc",
+    authDomain: "deutschlernenvn-ce368.firebaseapp.com",
+    projectId: "deutschlernenvn-ce368",
+    storageBucket: "deutschlernenvn-ce368.firebasestorage.app",
+    messagingSenderId: "1093157479291",
+    appId: "1:1093157479291:web:fa199ba7019011e5d813de",
+    measurementId: "G-HC32YTZ3YM"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+
+  // ====== TRANG SẼ CHUYỂN ĐẾN SAU KHI ĐĂNG NHẬP THÀNH CÔNG ======
+  const REDIRECT_PAGE = "index.html";
+
+  // Các phần tử DOM
+  const form = document.getElementById("authForm");
+  const emailInput = document.getElementById("email");
+  const passwordInput = document.getElementById("password");
+  const submitBtn = document.getElementById("submitBtn");
+  const messageBox = document.getElementById("message");
+  const formTitle = document.getElementById("formTitle");
+  const formSubtitle = document.getElementById("formSubtitle");
+  const toggleText = document.getElementById("toggleText");
+  const toggleLink = document.getElementById("toggleLink");
+  const forgotLink = document.getElementById("forgotLink");
+
+  let isLoginMode = true;
+
+  // Nếu đã đăng nhập rồi thì tự động chuyển trang (tránh phải đăng nhập lại)
+  onAuthStateChanged(auth, (user) => {
+    if (user) {
+      window.location.href = REDIRECT_PAGE;
+    }
+  });
+
+  // Chuyển đổi giữa form Đăng nhập <-> Đăng ký
+  toggleLink.addEventListener("click", () => {
+    isLoginMode = !isLoginMode;
+    hideMessage();
+
+    if (isLoginMode) {
+      formTitle.textContent = "Đăng nhập";
+      formSubtitle.textContent = "Học từ vựng tiếng Đức của riêng bạn";
+      submitBtn.textContent = "Đăng nhập";
+      toggleText.textContent = "Chưa có tài khoản?";
+      toggleLink.textContent = "Đăng ký ngay";
+      document.getElementById("forgotRow").style.display = "block";
+    } else {
+      formTitle.textContent = "Đăng ký";
+      formSubtitle.textContent = "Tạo tài khoản để lưu từ vựng của bạn";
+      submitBtn.textContent = "Đăng ký";
+      toggleText.textContent = "Đã có tài khoản?";
+      toggleLink.textContent = "Đăng nhập";
+      document.getElementById("forgotRow").style.display = "none";
+    }
+  });
+
+  // Quên mật khẩu
+  forgotLink.addEventListener("click", async () => {
+    const email = emailInput.value.trim();
+    if (!email) {
+      showMessage("Vui lòng nhập email trước để khôi phục mật khẩu.", "error");
+      return;
+    }
+    try {
+      await sendPasswordResetEmail(auth, email);
+      showMessage("Đã gửi email khôi phục mật khẩu. Hãy kiểm tra hộp thư của bạn.", "success");
+    } catch (err) {
+      showMessage(translateError(err.code), "error");
+    }
+  });
+
+  // Submit form (đăng nhập hoặc đăng ký)
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    hideMessage();
+
+    const email = emailInput.value.trim();
+    const password = passwordInput.value;
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = isLoginMode ? "Đang đăng nhập..." : "Đang đăng ký...";
+
+    try {
+      if (isLoginMode) {
+        await signInWithEmailAndPassword(auth, email, password);
+        // onAuthStateChanged sẽ tự chuyển trang
+      } else {
+        await createUserWithEmailAndPassword(auth, email, password);
+        showMessage("Tạo tài khoản thành công! Đang chuyển trang...", "success");
+        // onAuthStateChanged sẽ tự chuyển trang
+      }
+    } catch (err) {
+      showMessage(translateError(err.code), "error");
+      submitBtn.disabled = false;
+      submitBtn.textContent = isLoginMode ? "Đăng nhập" : "Đăng ký";
+    }
+  });
+
+  function showMessage(text, type) {
+    messageBox.textContent = text;
+    messageBox.className = "message " + type;
+  }
+
+  function hideMessage() {
+    messageBox.className = "message";
+    messageBox.textContent = "";
+  }
+
+  // Dịch lỗi Firebase sang tiếng Việt dễ hiểu
+  function translateError(code) {
+    const map = {
+      "auth/invalid-email": "Email không hợp lệ.",
+      "auth/user-disabled": "Tài khoản này đã bị khóa.",
+      "auth/user-not-found": "Không tìm thấy tài khoản với email này.",
+      "auth/wrong-password": "Sai mật khẩu. Vui lòng thử lại.",
+      "auth/invalid-credential": "Email hoặc mật khẩu không đúng.",
+      "auth/email-already-in-use": "Email này đã được đăng ký. Hãy đăng nhập thay vì đăng ký.",
+      "auth/weak-password": "Mật khẩu quá yếu, cần ít nhất 6 ký tự.",
+      "auth/missing-password": "Vui lòng nhập mật khẩu.",
+      "auth/too-many-requests": "Bạn đã thử quá nhiều lần. Vui lòng đợi một chút rồi thử lại.",
+      "auth/network-request-failed": "Lỗi kết nối mạng. Vui lòng kiểm tra Internet."
+    };
+    return map[code] || ("Đã xảy ra lỗi: " + code);
+  }
+</script>
+
+</body>
+</html>
