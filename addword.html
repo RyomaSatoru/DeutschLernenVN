@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="vi" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thêm từ - Học Tiếng Đức</title>
+    <style>
+        /* ====== HỆ THỐNG THEME (Dark / Light) ====== */
+        :root,
+        html[data-theme="light"] {
+            --bg: #f5f7fb;
+            --card-bg: #ffffff;
+            --text: #16213e;
+            --text-muted: #6b7280;
+            --border: #e8ebf2;
+            --input-bg: #ffffff;
+            --primary: #0f3460;
+            --primary-hover: #16213e;
+            --primary-soft: #e8edf7;
+            --shadow-sm: 0 1px 3px rgba(15, 52, 96, 0.06);
+            --header-bg: rgba(255, 255, 255, 0.85);
+            --danger: #c0392b;
+            --danger-soft: #fdecea;
+            --success: #1e7e4e;
+            --success-soft: #e8f8f0;
+            --der: #2563eb;
+            --die: #db2777;
+            --das: #16a34a;
+        }
+        html[data-theme="dark"] {
+            --bg: #0f1424;
+            --card-bg: #1c2336;
+            --text: #e9ecf5;
+            --text-muted: #9aa3bd;
+            --border: #2a3450;
+            --input-bg: #161c30;
+            --primary: #3b6fb5;
+            --primary-hover: #4d83cf;
+            --primary-soft: #232c44;
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
+            --header-bg: rgba(20, 26, 44, 0.85);
+            --danger: #e57373;
+            --danger-soft: #3a2225;
+            --success: #6ee7a8;
+            --success-soft: #1d3a2c;
+            --der: #60a5fa;
+            --die: #f472b6;
+            --das: #4ade80;
+        }
+
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            transition: background 0.3s, color 0.3s;
+        }
+        #checking { text-align: center; color: var(--text-muted); margin-top: 120px; font-size: 15px; }
+        #appContent { display: none; }
+
+        /* ====== HEADER ====== */
+        .site-header {
+            position: sticky; top: 0; z-index: 10;
+            background: var(--header-bg);
+            backdrop-filter: saturate(180%) blur(12px);
+            border-bottom: 1px solid var(--border);
+        }
+        .header-inner {
+            max-width: 640px; margin: 0 auto; padding: 14px 20px;
+            display: flex; align-items: center; gap: 12px;
+        }
+        .back-btn {
+            width: 38px; height: 38px;
+            display: inline-flex; align-items: center; justify-content: center;
+            background: var(--card-bg); color: var(--text);
+            border: 1px solid var(--border); border-radius: 10px;
+            cursor: pointer; font-size: 18px; text-decoration: none;
+            transition: background 0.2s, border-color 0.2s, transform 0.1s;
+        }
+        .back-btn:hover { background: var(--primary-soft); border-color: var(--primary); }
+        .back-btn:active { transform: scale(0.94); }
+        .header-title { font-size: 17px; font-weight: 700; }
+
+        /* ====== NỘI DUNG ====== */
+        main { max-width: 640px; margin: 0 auto; padding: 24px 20px 60px; }
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: var(--shadow-sm);
+        }
+        .field { margin-bottom: 20px; }
+        .field:last-child { margin-bottom: 0; }
+        label {
+            display: block; font-size: 13px; font-weight: 600; margin-bottom: 8px;
+        }
+        label .req { color: var(--danger); }
+        label .opt { color: var(--text-muted); font-weight: 400; }
+        input, textarea {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1.5px solid var(--border);
+            border-radius: 10px;
+            font-size: 15px;
+            background: var(--input-bg);
+            color: var(--text);
+            outline: none;
+            transition: border-color 0.2s;
+            font-family: inherit;
+        }
+        input:focus, textarea:focus { border-color: var(--primary); }
+        textarea { resize: vertical; min-height: 70px; }
+
+        /* ====== NHÓM NÚT CHỌN ====== */
+        .choice-group { display: flex; flex-wrap: wrap; gap: 8px; }
+        .choice {
+            padding: 10px 16px;
+            border: 1.5px solid var(--border);
+            border-radius: 10px;
+            background: var(--input-bg);
+            color: var(--text);
+            font-size: 14px; font-weight: 600;
+            cursor: pointer; user-select: none;
+            font-family: inherit;
+            transition: background 0.15s, border-color 0.15s, color 0.15s;
+        }
+        .choice.selected { background: var(--primary); border-color: var(--primary); color: #fff; }
+        /* Nút chọn giống tô màu */
+        .choice.gender.selected[data-gender="der"] { background: var(--der); border-color: var(--der); }
+        .choice.gender.selected[data-gender="die"] { background: var(--die); border-color: var(--die); }
+        .choice.gender.selected[data-gender="das"] { background: var(--das); border-color: var(--das); }
+
+        /* ====== CHIP CHỦ ĐỀ ====== */
+        .chip-group { display: flex; flex-wrap: wrap; gap: 8px; }
+        .topic-chip {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 8px 14px;
+            border: 1.5px solid var(--border);
+            border-radius: 999px;
+            background: var(--input-bg); color: var(--text);
+            font-size: 13.5px; cursor: pointer; user-select: none;
+            transition: background 0.15s, border-color 0.15s, color 0.15s;
+        }
+        .topic-chip.selected { background: var(--primary); border-color: var(--primary); color: #fff; }
+        .manage-topics-link {
+            display: inline-flex; align-items: center; gap: 6px;
+            margin-top: 12px;
+            background: none; border: none;
+            color: var(--primary); font-size: 13.5px; font-weight: 600;
+            cursor: pointer; font-family: inherit; padding: 0;
+        }
+        .manage-topics-link:hover { text-decoration: underline; }
+
+        #genderField { display: none; }
+        #genderField.show { display: block; }
+
+        /* ====== NÚT LƯU ====== */
+        .save-row { margin-top: 26px; }
+        .btn {
+            width: 100%;
+            padding: 14px;
+            border: none; border-radius: 11px;
+            background: var(--primary); color: #fff;
+            font-size: 15px; font-weight: 700;
+            cursor: pointer; font-family: inherit;
+            transition: background 0.2s, transform 0.1s;
+        }
+        .btn:hover { background: var(--primary-hover); }
+        .btn:active { transform: scale(0.99); }
+        .btn:disabled { background: #9aa3bd; cursor: not-allowed; }
+
+        .message {
+            margin-top: 16px; padding: 11px 14px; border-radius: 9px;
+            font-size: 14px; display: none; line-height: 1.45;
+        }
+        .message.error { background: var(--danger-soft); color: var(--danger); display: block; }
+        .message.success { background: var(--success-soft); color: var(--success); display: block; }
+    </style>
+</head>
+<body>
+
+    <div id="checking">Đang kiểm tra đăng nhập...</div>
+
+    <div id="appContent">
+        <header class="site-header">
+            <div class="header-inner">
+                <a class="back-btn" href="vocab.html" title="Quay lại" aria-label="Quay lại">←</a>
+                <span class="header-title" id="pageTitle">Thêm từ</span>
+            </div>
+        </header>
+
+        <main>
+            <div class="card">
+                <!-- Loại từ -->
+                <div class="field">
+                    <label>Loại từ <span class="req">*</span></label>
+                    <div class="choice-group" id="typeGroup">
+                        <button type="button" class="choice" data-type="Nomen">Nomen</button>
+                        <button type="button" class="choice" data-type="Verb">Verb</button>
+                        <button type="button" class="choice" data-type="Adj">Adj</button>
+                        <button type="button" class="choice" data-type="Phrase">Phrase</button>
+                    </div>
+                </div>
+
+                <!-- Từ tiếng Đức -->
+                <div class="field">
+                    <label for="wordInput">Từ tiếng Đức <span class="req">*</span></label>
+                    <input type="text" id="wordInput" placeholder="Ví dụ: Haus" autocomplete="off">
+                </div>
+
+                <!-- Giống (chỉ hiện với Nomen) -->
+                <div class="field" id="genderField">
+                    <label>Giống <span class="req">*</span></label>
+                    <div class="choice-group" id="genderGroup">
+                        <button type="button" class="choice gender" data-gender="der">der</button>
+                        <button type="button" class="choice gender" data-gender="die">die</button>
+                        <button type="button" class="choice gender" data-gender="das">das</button>
+                    </div>
+                </div>
+
+                <!-- Nghĩa tiếng Việt -->
+                <div class="field">
+                    <label for="meaningInput">Nghĩa tiếng Việt <span class="req">*</span></label>
+                    <input type="text" id="meaningInput" placeholder="Ví dụ: ngôi nhà" autocomplete="off">
+                </div>
+
+                <!-- Ví dụ -->
+                <div class="field">
+                    <label for="exampleInput">Ví dụ <span class="opt">(không bắt buộc)</span></label>
+                    <textarea id="exampleInput" placeholder="Ví dụ: Das Haus ist groß."></textarea>
+                </div>
+
+                <!-- Chủ đề -->
+                <div class="field">
+                    <label>Chủ đề <span class="req">*</span></label>
+                    <div class="chip-group" id="topicGroup"></div>
+                    <button type="button" class="manage-topics-link" id="manageTopicsBtn">🏷️ Quản lý chủ đề</button>
+                </div>
+
+                <div class="save-row">
+                    <button class="btn" id="saveBtn">Lưu từ</button>
+                </div>
+                <div class="message" id="message"></div>
+            </div>
+        </main>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import {
+            getAuth, onAuthStateChanged
+        } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+        import {
+            getFirestore, collection, query, where, getDocs, getDoc,
+            doc, addDoc, updateDoc, serverTimestamp
+        } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyA_0t95PFaeITktsCGnBQTF7pBD9Y9HhZc",
+            authDomain: "deutschlernenvn-ce368.firebaseapp.com",
+            projectId: "deutschlernenvn-ce368",
+            storageBucket: "deutschlernenvn-ce368.firebasestorage.app",
+            messagingSenderId: "1093157479291",
+            appId: "1:1093157479291:web:fa199ba7019011e5d813de",
+            measurementId: "G-HC32YTZ3YM"
+        };
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        const LOGIN_PAGE = "login.html";
+        const VOCAB_COLLECTION = "vocabulary";
+        const TOPICS_COLLECTION = "topics";
+        const OTHER_TOPIC = { id: "other", name: "Khác", icon: "🗂️" };
+        const DRAFT_KEY = "addword_draft";
+
+        // ====== DOM ======
+        const checkingEl = document.getElementById("checking");
+        const appContentEl = document.getElementById("appContent");
+        const pageTitle = document.getElementById("pageTitle");
+        const typeGroup = document.getElementById("typeGroup");
+        const wordInput = document.getElementById("wordInput");
+        const genderField = document.getElementById("genderField");
+        const genderGroup = document.getElementById("genderGroup");
+        const meaningInput = document.getElementById("meaningInput");
+        const exampleInput = document.getElementById("exampleInput");
+        const topicGroup = document.getElementById("topicGroup");
+        const manageTopicsBtn = document.getElementById("manageTopicsBtn");
+        const saveBtn = document.getElementById("saveBtn");
+        const messageEl = document.getElementById("message");
+
+        // ====== TRẠNG THÁI ======
+        let currentUid = null;
+        let editId = new URLSearchParams(location.search).get("id");  // null = thêm mới
+        let selectedType = null;
+        let selectedGender = null;
+        let selectedTopics = new Set();   // id chủ đề đã chọn
+        let topics = [];                  // [{id,name,icon}] gồm cả Khác
+
+        // ====== AUTH GUARD ======
+        onAuthStateChanged(auth, async (user) => {
+            if (!user) { window.location.href = LOGIN_PAGE; return; }
+            currentUid = user.uid;
+            checkingEl.style.display = "none";
+            appContentEl.style.display = "block";
+            await init();
+        });
+
+        async function init() {
+            if (editId) {
+                pageTitle.textContent = "Sửa từ";
+                saveBtn.textContent = "Lưu thay đổi";
+            }
+            await loadTopics();
+
+            // Nếu quay lại từ trang chủ đề (có nháp) thì khôi phục form đang dở
+            const draft = readDraft();
+            if (draft) {
+                applyState(draft);
+            } else if (editId) {
+                await loadWord();
+            } else {
+                // Thêm mới: mặc định chọn chủ đề "Khác"
+                selectedTopics.add("other");
+            }
+            renderTypeButtons();
+            renderGender();
+            renderTopicChips();
+        }
+
+        // ====== TẢI CHỦ ĐỀ ======
+        async function loadTopics() {
+            topics = [OTHER_TOPIC];
+            try {
+                const snap = await getDocs(query(
+                    collection(db, TOPICS_COLLECTION), where("uid", "==", currentUid)
+                ));
+                const userTopics = [];
+                snap.forEach((d) => {
+                    const t = d.data();
+                    userTopics.push({ id: d.id, name: t.name, icon: t.icon || "🏷️" });
+                });
+                userTopics.sort((a, b) => a.name.localeCompare(b.name, "vi"));
+                topics = [OTHER_TOPIC, ...userTopics];
+            } catch (err) {
+                console.warn("Không tải được chủ đề:", err);
+            }
+        }
+
+        // ====== TẢI TỪ (chế độ sửa) ======
+        async function loadWord() {
+            try {
+                const snap = await getDoc(doc(db, VOCAB_COLLECTION, editId));
+                if (!snap.exists()) {
+                    showMessage("Không tìm thấy từ cần sửa.", "error");
+                    return;
+                }
+                const w = snap.data();
+                selectedType = w.type || null;
+                selectedGender = w.gender || null;
+                wordInput.value = w.word || "";
+                meaningInput.value = w.meaning || "";
+                exampleInput.value = w.example || "";
+                selectedTopics = new Set((w.topics && w.topics.length) ? w.topics : ["other"]);
+            } catch (err) {
+                showMessage("Lỗi tải từ: " + (err.code || err.message), "error");
+            }
+        }
+
+        // ====== RENDER LOẠI TỪ ======
+        function renderTypeButtons() {
+            typeGroup.querySelectorAll(".choice").forEach((btn) => {
+                btn.classList.toggle("selected", btn.dataset.type === selectedType);
+            });
+            // Hiện ô giống nếu là danh từ
+            genderField.classList.toggle("show", selectedType === "Nomen");
+        }
+        typeGroup.addEventListener("click", (e) => {
+            const btn = e.target.closest(".choice");
+            if (!btn) return;
+            selectedType = btn.dataset.type;
+            if (selectedType !== "Nomen") selectedGender = null;
+            renderTypeButtons();
+            renderGender();
+        });
+
+        // ====== RENDER GIỐNG ======
+        function renderGender() {
+            genderGroup.querySelectorAll(".choice").forEach((btn) => {
+                btn.classList.toggle("selected", btn.dataset.gender === selectedGender);
+            });
+        }
+        genderGroup.addEventListener("click", (e) => {
+            const btn = e.target.closest(".choice");
+            if (!btn) return;
+            selectedGender = (selectedGender === btn.dataset.gender) ? null : btn.dataset.gender;
+            renderGender();
+        });
+
+        // ====== RENDER CHIP CHỦ ĐỀ ======
+        function renderTopicChips() {
+            topicGroup.innerHTML = "";
+            topics.forEach((t) => {
+                const chip = document.createElement("div");
+                chip.className = "topic-chip" + (selectedTopics.has(t.id) ? " selected" : "");
+                chip.textContent = `${t.icon} ${t.name}`;
+                chip.addEventListener("click", () => {
+                    if (selectedTopics.has(t.id)) selectedTopics.delete(t.id);
+                    else selectedTopics.add(t.id);
+                    chip.classList.toggle("selected");
+                });
+                topicGroup.appendChild(chip);
+            });
+        }
+
+        // ====== QUẢN LÝ CHỦ ĐỀ (giữ nháp rồi sang trang chủ đề) ======
+        manageTopicsBtn.addEventListener("click", () => {
+            saveDraft();
+            window.location.href = "topics.html";
+        });
+
+        // ====== NHÁP (sessionStorage) ======
+        function currentState() {
+            return {
+                forId: editId || "",
+                type: selectedType,
+                gender: selectedGender,
+                word: wordInput.value,
+                meaning: meaningInput.value,
+                example: exampleInput.value,
+                topics: [...selectedTopics]
+            };
+        }
+        function saveDraft() {
+            try { sessionStorage.setItem(DRAFT_KEY, JSON.stringify(currentState())); } catch (e) {}
+        }
+        function readDraft() {
+            try {
+                const raw = sessionStorage.getItem(DRAFT_KEY);
+                if (!raw) return null;
+                sessionStorage.removeItem(DRAFT_KEY); // dùng một lần
+                const d = JSON.parse(raw);
+                // Chỉ khôi phục nếu đúng ngữ cảnh (cùng là thêm mới, hoặc cùng id sửa)
+                if ((d.forId || "") !== (editId || "")) return null;
+                return d;
+            } catch (e) { return null; }
+        }
+        function applyState(d) {
+            selectedType = d.type || null;
+            selectedGender = d.gender || null;
+            wordInput.value = d.word || "";
+            meaningInput.value = d.meaning || "";
+            exampleInput.value = d.example || "";
+            selectedTopics = new Set(d.topics && d.topics.length ? d.topics : ["other"]);
+            // Bỏ chọn chủ đề không còn tồn tại (trừ "other")
+            const valid = new Set(topics.map((t) => t.id));
+            selectedTopics = new Set([...selectedTopics].filter((id) => valid.has(id)));
+            if (selectedTopics.size === 0) selectedTopics.add("other");
+        }
+
+        // ====== LƯU ======
+        saveBtn.addEventListener("click", async () => {
+            hideMessage();
+            const word = wordInput.value.trim();
+            const meaning = meaningInput.value.trim();
+            const example = exampleInput.value.trim();
+
+            // Kiểm tra hợp lệ
+            if (!selectedType) return showMessage("Vui lòng chọn loại từ.", "error");
+            if (!word) return showMessage("Vui lòng nhập từ tiếng Đức.", "error");
+            if (selectedType === "Nomen" && !selectedGender)
+                return showMessage("Vui lòng chọn giống (der/die/das) cho danh từ.", "error");
+            if (!meaning) return showMessage("Vui lòng nhập nghĩa tiếng Việt.", "error");
+            if (selectedTopics.size === 0) return showMessage("Vui lòng chọn ít nhất một chủ đề.", "error");
+
+            const data = {
+                uid: currentUid,
+                type: selectedType,
+                word,
+                meaning,
+                gender: selectedType === "Nomen" ? selectedGender : null,
+                example,
+                topics: [...selectedTopics],
+                updatedAt: serverTimestamp()
+            };
+
+            saveBtn.disabled = true;
+            saveBtn.textContent = "Đang lưu...";
+            try {
+                if (editId) {
+                    await updateDoc(doc(db, VOCAB_COLLECTION, editId), data);
+                } else {
+                    data.createdAt = serverTimestamp();
+                    await addDoc(collection(db, VOCAB_COLLECTION), data);
+                }
+                sessionStorage.removeItem(DRAFT_KEY);
+                window.location.href = "vocab.html";
+            } catch (err) {
+                showMessage("Không lưu được: " + (err.code || err.message), "error");
+                saveBtn.disabled = false;
+                saveBtn.textContent = editId ? "Lưu thay đổi" : "Lưu từ";
+            }
+        });
+
+        function showMessage(text, type) { messageEl.textContent = text; messageEl.className = "message " + type; }
+        function hideMessage() { messageEl.className = "message"; messageEl.textContent = ""; }
+    </script>
+
+    <!-- Áp dụng theme sớm để tránh nhấp nháy màu -->
+    <script>
+        (function () {
+            const saved = localStorage.getItem("theme") || "light";
+            document.documentElement.setAttribute("data-theme", saved);
+        })();
+    </script>
+
+</body>
+</html>
