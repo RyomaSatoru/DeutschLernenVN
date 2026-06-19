@@ -1,49 +1,191 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="vi" data-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Web Tiếng Đức Của Tôi</title>
+    <title>Trang chủ - Học Tiếng Đức</title>
     <style>
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
-            max-width: 700px;
-            margin: 60px auto;
-            padding: 0 20px;
-            color: #16213e;
+        /* ====== HỆ THỐNG THEME (Dark / Light) ======
+           Mọi màu sắc dùng biến CSS. Trang cài đặt sau này chỉ cần đổi
+           thuộc tính data-theme="dark" hoặc "light" trên thẻ <html>. */
+        :root,
+        html[data-theme="light"] {
+            --bg: #f4f6fb;
+            --bg-gradient: linear-gradient(135deg, #eef1f8 0%, #f4f6fb 100%);
+            --card-bg: #ffffff;
+            --text: #16213e;
+            --text-muted: #6b7280;
+            --border: #e5e7eb;
+            --primary: #0f3460;
+            --primary-hover: #16213e;
+            --shadow: 0 10px 30px rgba(15, 52, 96, 0.10);
+            --accent-soft: #e8edf7;
         }
+        html[data-theme="dark"] {
+            --bg: #0f1424;
+            --bg-gradient: linear-gradient(135deg, #1a1a2e 0%, #16213e 60%, #0f1424 100%);
+            --card-bg: #1c2336;
+            --text: #e9ecf5;
+            --text-muted: #9aa3bd;
+            --border: #2c3650;
+            --primary: #3b6fb5;
+            --primary-hover: #4d83cf;
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+            --accent-soft: #232c44;
+        }
+
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+            background: var(--bg-gradient);
+            color: var(--text);
+            transition: background 0.3s, color 0.3s;
+        }
+        .wrap {
+            max-width: 720px;
+            margin: 0 auto;
+            padding: 28px 20px 60px;
+        }
+
+        /* Hiển thị trong khi đang kiểm tra trạng thái đăng nhập */
         #checking {
             text-align: center;
-            color: #888;
-            margin-top: 100px;
+            color: var(--text-muted);
+            margin-top: 120px;
+            font-size: 15px;
         }
-        #appContent {
-            display: none;
-        }
+        #appContent { display: none; }
+
+        /* ====== THANH TRÊN CÙNG ====== */
         .topbar {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 1px solid #eee;
-            padding-bottom: 16px;
-            margin-bottom: 24px;
+            margin-bottom: 36px;
+        }
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 18px;
+            font-weight: 700;
+        }
+        .brand .flag { font-size: 24px; }
+        .topbar-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
         .user-email {
-            font-size: 14px;
-            color: #555;
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-right: 4px;
         }
-        .logout-btn {
-            background: #0f3460;
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 8px;
+        .icon-btn {
+            width: 40px;
+            height: 40px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--card-bg);
+            color: var(--text);
+            border: 1px solid var(--border);
+            border-radius: 10px;
             cursor: pointer;
-            font-size: 14px;
+            font-size: 18px;
+            transition: background 0.2s, transform 0.1s, border-color 0.2s;
         }
-        .logout-btn:hover {
-            background: #16213e;
+        .icon-btn:hover { background: var(--accent-soft); }
+        .icon-btn:active { transform: scale(0.94); }
+        .logout-btn {
+            background: transparent;
+            color: var(--text-muted);
+            border: 1px solid var(--border);
+            padding: 9px 14px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: background 0.2s, color 0.2s;
         }
+        .logout-btn:hover { background: var(--accent-soft); color: var(--text); }
+
+        /* ====== KHỐI CHÀO MỪNG ====== */
+        .hero {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        .hero h1 {
+            font-size: 30px;
+            margin: 0 0 8px;
+        }
+        .hero p {
+            color: var(--text-muted);
+            font-size: 15px;
+            margin: 0;
+        }
+
+        /* ====== CÁC THẺ HÀNH ĐỘNG ====== */
+        .actions {
+            display: grid;
+            gap: 16px;
+        }
+        .action-card {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            width: 100%;
+            text-align: left;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 22px 24px;
+            cursor: pointer;
+            box-shadow: var(--shadow);
+            color: var(--text);
+            transition: transform 0.12s, box-shadow 0.2s, border-color 0.2s;
+            font-family: inherit;
+        }
+        .action-card:hover {
+            transform: translateY(-3px);
+            border-color: var(--primary);
+        }
+        .action-card:active { transform: translateY(-1px); }
+        .action-card .emoji {
+            font-size: 34px;
+            width: 58px;
+            height: 58px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--accent-soft);
+            border-radius: 14px;
+            flex-shrink: 0;
+        }
+        .action-card .label { flex: 1; }
+        .action-card .label strong {
+            display: block;
+            font-size: 18px;
+            margin-bottom: 3px;
+        }
+        .action-card .label span {
+            font-size: 13.5px;
+            color: var(--text-muted);
+        }
+        .action-card .arrow {
+            font-size: 20px;
+            color: var(--text-muted);
+        }
+        .action-card.primary {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: #fff;
+        }
+        .action-card.primary .emoji { background: rgba(255,255,255,0.18); }
+        .action-card.primary .label span { color: rgba(255,255,255,0.8); }
+        .action-card.primary .arrow { color: rgba(255,255,255,0.9); }
+        .action-card.primary:hover { background: var(--primary-hover); }
     </style>
 </head>
 <body>
@@ -53,13 +195,35 @@
 
     <!-- Nội dung trang chỉ hiện ra sau khi xác nhận đã đăng nhập -->
     <div id="appContent">
-        <div class="topbar">
-            <span class="user-email" id="userEmail"></span>
-            <button class="logout-btn" id="logoutBtn">Đăng xuất</button>
-        </div>
+        <div class="wrap">
+            <div class="topbar">
+                <div class="brand">
+                    <span class="flag">🇩🇪</span>
+                    <span>Học Tiếng Đức</span>
+                </div>
+                <div class="topbar-actions">
+                    <span class="user-email" id="userEmail"></span>
+                    <button class="icon-btn" id="settingsBtn" title="Cài đặt" aria-label="Cài đặt">⚙️</button>
+                    <button class="logout-btn" id="logoutBtn">Đăng xuất</button>
+                </div>
+            </div>
 
-        <h1>Mọi thứ đã sẵn sàng 100%!</h1>
-        <p>Chào mừng bạn đến với trang web lưu từ vựng tiếng Đức đầu tay.</p>
+            <div class="hero">
+                <h1>Xin chào! 👋</h1>
+                <p>Hôm nay bạn muốn học gì?</p>
+            </div>
+
+            <div class="actions">
+                <button class="action-card primary" id="vocabBtn">
+                    <span class="emoji">📚</span>
+                    <span class="label">
+                        <strong>Học từ vựng</strong>
+                        <span>Ôn tập và thêm từ vựng tiếng Đức của bạn</span>
+                    </span>
+                    <span class="arrow">→</span>
+                </button>
+            </div>
+        </div>
     </div>
 
     <script type="module">
@@ -84,11 +248,15 @@
         const auth = getAuth(app);
 
         const LOGIN_PAGE = "login.html";
+        const VOCAB_PAGE = "vocab.html";       // trang học từ vựng (sẽ làm sau)
+        const SETTINGS_PAGE = "settings.html"; // trang cài đặt (sẽ làm sau)
 
         const checkingEl = document.getElementById("checking");
         const appContentEl = document.getElementById("appContent");
         const userEmailEl = document.getElementById("userEmail");
         const logoutBtn = document.getElementById("logoutBtn");
+        const settingsBtn = document.getElementById("settingsBtn");
+        const vocabBtn = document.getElementById("vocabBtn");
 
         // ====== AUTH GUARD ======
         // Nếu chưa đăng nhập -> đẩy về trang login
@@ -107,11 +275,29 @@
             appContentEl.style.display = "block";
         });
 
+        // ====== ĐIỀU HƯỚNG ======
+        vocabBtn.addEventListener("click", () => {
+            window.location.href = VOCAB_PAGE;
+        });
+        settingsBtn.addEventListener("click", () => {
+            window.location.href = SETTINGS_PAGE;
+        });
+
         // ====== ĐĂNG XUẤT ======
         logoutBtn.addEventListener("click", async () => {
             await signOut(auth);
             window.location.href = LOGIN_PAGE;
         });
+    </script>
+
+    <!-- ====== ÁP DỤNG THEME (Dark / Light) ======
+         Đặt riêng (không phải module) và chạy sớm để tránh nhấp nháy màu.
+         Trang cài đặt sau này chỉ cần ghi localStorage.setItem("theme", "dark"/"light"). -->
+    <script>
+        (function () {
+            const saved = localStorage.getItem("theme") || "light";
+            document.documentElement.setAttribute("data-theme", saved);
+        })();
     </script>
 
 </body>
