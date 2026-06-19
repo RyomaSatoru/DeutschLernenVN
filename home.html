@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="vi" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trang chủ - Học Tiếng Đức</title>
+    <style>
+        /* ====== HỆ THỐNG THEME (Dark / Light) ======
+           Mọi màu sắc dùng biến CSS. Trang cài đặt sau này chỉ cần đổi
+           thuộc tính data-theme="dark" hoặc "light" trên thẻ <html>. */
+        :root,
+        html[data-theme="light"] {
+            --bg: #f5f7fb;
+            --bg-soft: #eef1f8;
+            --card-bg: #ffffff;
+            --text: #16213e;
+            --text-muted: #6b7280;
+            --border: #e8ebf2;
+            --primary: #0f3460;
+            --primary-hover: #16213e;
+            --primary-soft: #e8edf7;
+            --shadow-sm: 0 1px 3px rgba(15, 52, 96, 0.06);
+            --shadow: 0 8px 24px rgba(15, 52, 96, 0.08);
+            --accent: #f59e0b;
+            --header-bg: rgba(255, 255, 255, 0.85);
+        }
+        html[data-theme="dark"] {
+            --bg: #0f1424;
+            --bg-soft: #161c30;
+            --card-bg: #1c2336;
+            --text: #e9ecf5;
+            --text-muted: #9aa3bd;
+            --border: #2a3450;
+            --primary: #3b6fb5;
+            --primary-hover: #4d83cf;
+            --primary-soft: #232c44;
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
+            --shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+            --accent: #fbbf24;
+            --header-bg: rgba(20, 26, 44, 0.85);
+        }
+
+        * { box-sizing: border-box; }
+        html, body { height: 100%; }
+        body {
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            transition: background 0.3s, color 0.3s;
+        }
+
+        /* Hiển thị trong khi đang kiểm tra trạng thái đăng nhập */
+        #checking {
+            text-align: center;
+            color: var(--text-muted);
+            margin-top: 120px;
+            font-size: 15px;
+        }
+        #appContent {
+            display: none;
+            flex-direction: column;
+            flex: 1;
+        }
+
+        /* ====== HEADER ====== */
+        .site-header {
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            background: var(--header-bg);
+            backdrop-filter: saturate(180%) blur(12px);
+            border-bottom: 1px solid var(--border);
+        }
+        .header-inner {
+            max-width: 860px;
+            margin: 0 auto;
+            padding: 14px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 17px;
+            font-weight: 700;
+            letter-spacing: -0.2px;
+        }
+        .brand .flag { font-size: 22px; }
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .user-chip {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            color: var(--text-muted);
+            padding: 6px 10px 6px 6px;
+            border: 1px solid var(--border);
+            border-radius: 999px;
+            background: var(--card-bg);
+        }
+        .avatar {
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: #fff;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+        .icon-btn {
+            width: 38px;
+            height: 38px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--card-bg);
+            color: var(--text);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 17px;
+            transition: background 0.2s, transform 0.1s, border-color 0.2s;
+        }
+        .icon-btn:hover { background: var(--primary-soft); border-color: var(--primary); }
+        .icon-btn:active { transform: scale(0.94); }
+
+        /* ====== NỘI DUNG CHÍNH ====== */
+        main {
+            max-width: 860px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 40px 20px 48px;
+            flex: 1;
+        }
+        .hero {
+            margin-bottom: 30px;
+        }
+        .hero h1 {
+            font-size: 28px;
+            margin: 0 0 6px;
+            letter-spacing: -0.5px;
+        }
+        .hero p {
+            color: var(--text-muted);
+            font-size: 15px;
+            margin: 0;
+        }
+
+        .section-title {
+            font-size: 13px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            color: var(--text-muted);
+            margin: 0 0 14px;
+        }
+
+        /* ====== Ô THỐNG KÊ ====== */
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+            gap: 14px;
+            margin-bottom: 36px;
+        }
+        .stat-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+        .stat-card .stat-icon {
+            font-size: 22px;
+            width: 48px;
+            height: 48px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--primary-soft);
+            border-radius: 12px;
+            flex-shrink: 0;
+        }
+        .stat-card .stat-value {
+            font-size: 26px;
+            font-weight: 800;
+            line-height: 1.1;
+            letter-spacing: -0.5px;
+        }
+        .stat-card .stat-label {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        /* ====== CÁC THẺ HÀNH ĐỘNG ====== */
+        .actions {
+            display: grid;
+            gap: 14px;
+        }
+        .action-card {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            width: 100%;
+            text-align: left;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 22px 24px;
+            cursor: pointer;
+            box-shadow: var(--shadow-sm);
+            color: var(--text);
+            transition: transform 0.14s ease, box-shadow 0.2s, border-color 0.2s;
+            font-family: inherit;
+        }
+        .action-card:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow);
+            border-color: var(--primary);
+        }
+        .action-card:active { transform: translateY(-1px); }
+        .action-card .emoji {
+            font-size: 30px;
+            width: 56px;
+            height: 56px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--primary-soft);
+            border-radius: 14px;
+            flex-shrink: 0;
+        }
+        .action-card .label { flex: 1; }
+        .action-card .label strong {
+            display: block;
+            font-size: 17px;
+            margin-bottom: 3px;
+        }
+        .action-card .label span {
+            font-size: 13.5px;
+            color: var(--text-muted);
+        }
+        .action-card .arrow {
+            font-size: 20px;
+            color: var(--text-muted);
+            transition: transform 0.2s;
+        }
+        .action-card:hover .arrow { transform: translateX(4px); }
+        .action-card.primary {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%);
+            border-color: transparent;
+            color: #fff;
+        }
+        .action-card.primary .emoji { background: rgba(255,255,255,0.18); }
+        .action-card.primary .label span { color: rgba(255,255,255,0.82); }
+        .action-card.primary .arrow { color: rgba(255,255,255,0.9); }
+
+        /* ====== FOOTER ====== */
+        .site-footer {
+            text-align: center;
+            font-size: 12.5px;
+            color: var(--text-muted);
+            padding: 24px 20px 30px;
+            border-top: 1px solid var(--border);
+        }
+
+        @media (max-width: 540px) {
+            .user-chip .email-text { display: none; }
+            .hero h1 { font-size: 24px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Hiển thị trong khi đang kiểm tra trạng thái đăng nhập -->
+    <div id="checking">Đang kiểm tra đăng nhập...</div>
+
+    <!-- Nội dung trang chỉ hiện ra sau khi xác nhận đã đăng nhập -->
+    <div id="appContent">
+        <header class="site-header">
+            <div class="header-inner">
+                <div class="brand">
+                    <span class="flag">🇩🇪</span>
+                    <span>DeutschlernenVN</span>
+                </div>
+                <div class="header-actions">
+                    <span class="user-chip">
+                        <span class="avatar" id="avatar"></span>
+                        <span class="email-text" id="userEmail"></span>
+                    </span>
+                    <button class="icon-btn" id="settingsBtn" title="Cài đặt" aria-label="Cài đặt">⚙️</button>
+                    <button class="icon-btn" id="logoutBtn" title="Đăng xuất" aria-label="Đăng xuất">⏻</button>
+                </div>
+            </div>
+        </header>
+
+        <main>
+            <div class="hero">
+                <h1 id="greeting">Xin chào! 👋</h1>
+                <p>Hôm nay là một ngày tuyệt vời để học thêm vài từ tiếng Đức.</p>
+            </div>
+
+            <p class="section-title">Tổng quan</p>
+            <div class="stats">
+                <div class="stat-card">
+                    <span class="stat-icon">📦</span>
+                    <div>
+                        <div class="stat-value" id="wordCount">…</div>
+                        <div class="stat-label">Từ đã lưu</div>
+                    </div>
+                </div>
+            </div>
+
+            <p class="section-title">Bắt đầu học</p>
+            <div class="actions">
+                <button class="action-card primary" id="vocabBtn">
+                    <span class="emoji">📚</span>
+                    <span class="label">
+                        <strong>Học từ vựng</strong>
+                        <span>Ôn tập và thêm từ vựng tiếng Đức của bạn</span>
+                    </span>
+                    <span class="arrow">→</span>
+                </button>
+            </div>
+        </main>
+
+        <footer class="site-footer">
+            DeutschlernenVN · Học tiếng Đức theo cách của riêng bạn
+        </footer>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import {
+            getAuth,
+            onAuthStateChanged,
+            signOut
+        } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+        import {
+            getFirestore,
+            collection,
+            query,
+            where,
+            getCountFromServer
+        } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyA_0t95PFaeITktsCGnBQTF7pBD9Y9HhZc",
+            authDomain: "deutschlernenvn-ce368.firebaseapp.com",
+            projectId: "deutschlernenvn-ce368",
+            storageBucket: "deutschlernenvn-ce368.firebasestorage.app",
+            messagingSenderId: "1093157479291",
+            appId: "1:1093157479291:web:fa199ba7019011e5d813de",
+            measurementId: "G-HC32YTZ3YM"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        const LOGIN_PAGE = "login.html";
+        const VOCAB_PAGE = "vocab.html";       // trang học từ vựng (sẽ làm sau)
+        const SETTINGS_PAGE = "settings.html"; // trang cài đặt (sẽ làm sau)
+
+        // Tên collection lưu từ vựng. Khi làm trang học từ vựng, hãy lưu mỗi từ
+        // là 1 document trong collection này, kèm field uid = uid người dùng.
+        // Khi đó ô "Từ đã lưu" sẽ tự động hiển thị đúng số lượng.
+        const VOCAB_COLLECTION = "vocabulary";
+
+        const checkingEl = document.getElementById("checking");
+        const appContentEl = document.getElementById("appContent");
+        const userEmailEl = document.getElementById("userEmail");
+        const avatarEl = document.getElementById("avatar");
+        const greetingEl = document.getElementById("greeting");
+        const wordCountEl = document.getElementById("wordCount");
+        const logoutBtn = document.getElementById("logoutBtn");
+        const settingsBtn = document.getElementById("settingsBtn");
+        const vocabBtn = document.getElementById("vocabBtn");
+
+        // ====== AUTH GUARD ======
+        onAuthStateChanged(auth, async (user) => {
+            if (!user) {
+                window.location.href = LOGIN_PAGE;
+                return;
+            }
+
+            // Tải lại hồ sơ mới nhất từ máy chủ. Cần thiết vì tên hiển thị có thể
+            // vừa được đổi ở trang cài đặt, nhưng bộ nhớ đệm của Firebase vẫn giữ
+            // tên cũ cho tới khi được làm mới -> nếu không reload sẽ thấy tên cũ.
+            try {
+                await user.reload();
+                user = auth.currentUser || user;
+            } catch (err) {
+                console.warn("Không tải lại được hồ sơ:", err);
+            }
+
+            window.currentUserUid = user.uid; // dùng cho Firestore sau này
+
+            // Hiển thị thông tin người dùng
+            const email = user.email || "";
+            userEmailEl.textContent = email;
+            avatarEl.textContent = (user.displayName || email).charAt(0) || "?";
+            // Ưu tiên tên hiển thị đặt trong trang cài đặt, nếu chưa có thì lấy phần trước @ của email
+            const namePart = (user.displayName && user.displayName.trim())
+                || email.split("@")[0]
+                || "bạn";
+            greetingEl.textContent = `Xin chào, ${namePart}! 👋`;
+
+            checkingEl.style.display = "none";
+            appContentEl.style.display = "flex";
+
+            loadWordCount(user.uid);
+        });
+
+        // ====== ĐẾM SỐ TỪ ĐÃ LƯU ======
+        async function loadWordCount(uid) {
+            try {
+                const q = query(
+                    collection(db, VOCAB_COLLECTION),
+                    where("uid", "==", uid)
+                );
+                const snapshot = await getCountFromServer(q);
+                wordCountEl.textContent = snapshot.data().count;
+            } catch (err) {
+                // Chưa có dữ liệu / chưa cấu hình Firestore -> hiển thị 0
+                console.warn("Không đếm được số từ:", err);
+                wordCountEl.textContent = "0";
+            }
+        }
+
+        // ====== ĐIỀU HƯỚNG ======
+        vocabBtn.addEventListener("click", () => {
+            window.location.href = VOCAB_PAGE;
+        });
+        settingsBtn.addEventListener("click", () => {
+            window.location.href = SETTINGS_PAGE;
+        });
+
+        // ====== ĐĂNG XUẤT ======
+        logoutBtn.addEventListener("click", async () => {
+            await signOut(auth);
+            window.location.href = LOGIN_PAGE;
+        });
+    </script>
+
+    <!-- ====== ÁP DỤNG THEME (Dark / Light) ======
+         Chạy sớm để tránh nhấp nháy màu. Trang cài đặt sau này chỉ cần ghi
+         localStorage.setItem("theme", "dark"/"light") rồi đặt lại data-theme. -->
+    <script>
+        (function () {
+            const saved = localStorage.getItem("theme") || "light";
+            document.documentElement.setAttribute("data-theme", saved);
+        })();
+    </script>
+
+</body>
+</html>
