@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="vi" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cài đặt - Học Tiếng Đức</title>
+    <style>
+        /* ====== HỆ THỐNG THEME (Dark / Light) ====== */
+        :root,
+        html[data-theme="light"] {
+            --bg: #f5f7fb;
+            --card-bg: #ffffff;
+            --text: #16213e;
+            --text-muted: #6b7280;
+            --border: #e8ebf2;
+            --input-bg: #ffffff;
+            --primary: #0f3460;
+            --primary-hover: #16213e;
+            --primary-soft: #e8edf7;
+            --shadow-sm: 0 1px 3px rgba(15, 52, 96, 0.06);
+            --header-bg: rgba(255, 255, 255, 0.85);
+            --track: #d4d9e6;
+            --danger: #c0392b;
+            --danger-soft: #fdecea;
+            --success: #1e7e4e;
+            --success-soft: #e8f8f0;
+        }
+        html[data-theme="dark"] {
+            --bg: #0f1424;
+            --card-bg: #1c2336;
+            --text: #e9ecf5;
+            --text-muted: #9aa3bd;
+            --border: #2a3450;
+            --input-bg: #161c30;
+            --primary: #3b6fb5;
+            --primary-hover: #4d83cf;
+            --primary-soft: #232c44;
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
+            --header-bg: rgba(20, 26, 44, 0.85);
+            --danger: #e57373;
+            --danger-soft: #3a2225;
+            --success: #6ee7a8;
+            --success-soft: #1d3a2c;
+        }
+
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            transition: background 0.3s, color 0.3s;
+        }
+
+        #checking {
+            text-align: center;
+            color: var(--text-muted);
+            margin-top: 120px;
+            font-size: 15px;
+        }
+        #appContent { display: none; }
+
+        /* ====== HEADER ====== */
+        .site-header {
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            background: var(--header-bg);
+            backdrop-filter: saturate(180%) blur(12px);
+            border-bottom: 1px solid var(--border);
+        }
+        .header-inner {
+            max-width: 720px;
+            margin: 0 auto;
+            padding: 14px 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .back-btn {
+            width: 38px;
+            height: 38px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--card-bg);
+            color: var(--text);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 18px;
+            text-decoration: none;
+            transition: background 0.2s, border-color 0.2s, transform 0.1s;
+        }
+        .back-btn:hover { background: var(--primary-soft); border-color: var(--primary); }
+        .back-btn:active { transform: scale(0.94); }
+        .header-title {
+            font-size: 17px;
+            font-weight: 700;
+        }
+
+        /* ====== NỘI DUNG ====== */
+        main {
+            max-width: 720px;
+            margin: 0 auto;
+            padding: 32px 20px 60px;
+        }
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: var(--shadow-sm);
+            margin-bottom: 20px;
+        }
+        .card h2 {
+            font-size: 16px;
+            margin: 0 0 4px;
+        }
+        .card .card-desc {
+            font-size: 13.5px;
+            color: var(--text-muted);
+            margin: 0 0 20px;
+        }
+
+        label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+        .field { margin-bottom: 16px; }
+        .field:last-child { margin-bottom: 0; }
+        input {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1.5px solid var(--border);
+            border-radius: 10px;
+            font-size: 15px;
+            background: var(--input-bg);
+            color: var(--text);
+            outline: none;
+            transition: border-color 0.2s;
+            font-family: inherit;
+        }
+        input:focus { border-color: var(--primary); }
+        .password-wrapper { position: relative; }
+        .password-wrapper input { padding-right: 44px; }
+        .toggle-pw-btn {
+            position: absolute;
+            right: 6px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 6px;
+            font-size: 17px;
+            color: var(--text-muted);
+            user-select: none;
+        }
+
+        .btn {
+            padding: 11px 18px;
+            border: none;
+            border-radius: 10px;
+            background: var(--primary);
+            color: #fff;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.1s;
+            font-family: inherit;
+        }
+        .btn:hover { background: var(--primary-hover); }
+        .btn:active { transform: scale(0.98); }
+        .btn:disabled { background: #9aa3bd; cursor: not-allowed; }
+        .btn-row { margin-top: 18px; }
+
+        /* ====== CHỌN THEME ====== */
+        .theme-options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+        .theme-option {
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            padding: 16px;
+            cursor: pointer;
+            text-align: center;
+            background: var(--card-bg);
+            transition: border-color 0.2s, transform 0.1s;
+        }
+        .theme-option:active { transform: scale(0.98); }
+        .theme-option.active { border-color: var(--primary); }
+        .theme-preview {
+            height: 54px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            border: 1px solid var(--border);
+        }
+        .theme-preview.light { background: linear-gradient(135deg, #eef1f8, #ffffff); }
+        .theme-preview.dark { background: linear-gradient(135deg, #1a1a2e, #16213e); }
+        .theme-option .theme-name {
+            font-size: 14px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+        .theme-option .check { color: var(--primary); opacity: 0; }
+        .theme-option.active .check { opacity: 1; }
+
+        /* ====== THÔNG BÁO ====== */
+        .message {
+            margin-top: 16px;
+            padding: 10px 12px;
+            border-radius: 8px;
+            font-size: 13.5px;
+            display: none;
+            line-height: 1.4;
+        }
+        .message.error { background: var(--danger-soft); color: var(--danger); display: block; }
+        .message.success { background: var(--success-soft); color: var(--success); display: block; }
+    </style>
+</head>
+<body>
+
+    <div id="checking">Đang kiểm tra đăng nhập...</div>
+
+    <div id="appContent">
+        <header class="site-header">
+            <div class="header-inner">
+                <a class="back-btn" href="index.html" title="Quay lại" aria-label="Quay lại">←</a>
+                <span class="header-title">Cài đặt</span>
+            </div>
+        </header>
+
+        <main>
+            <!-- ====== GIAO DIỆN ====== -->
+            <section class="card">
+                <h2>🎨 Giao diện</h2>
+                <p class="card-desc">Chọn chế độ sáng hoặc tối cho toàn bộ trang web.</p>
+                <div class="theme-options">
+                    <div class="theme-option" data-theme-choice="light">
+                        <div class="theme-preview light"></div>
+                        <div class="theme-name">☀️ Sáng <span class="check">✓</span></div>
+                    </div>
+                    <div class="theme-option" data-theme-choice="dark">
+                        <div class="theme-preview dark"></div>
+                        <div class="theme-name">🌙 Tối <span class="check">✓</span></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ====== HỒ SƠ (TÊN HIỂN THỊ) ====== -->
+            <section class="card">
+                <h2>👤 Tên hiển thị</h2>
+                <p class="card-desc">Tên này sẽ hiện ở lời chào trên trang chủ.</p>
+                <div class="field">
+                    <label for="displayName">Tên của bạn</label>
+                    <input type="text" id="displayName" placeholder="Ví dụ: Ryoma" maxlength="40" autocomplete="nickname">
+                </div>
+                <div class="btn-row">
+                    <button class="btn" id="saveNameBtn">Lưu tên</button>
+                </div>
+                <div class="message" id="nameMessage"></div>
+            </section>
+
+            <!-- ====== ĐỔI MẬT KHẨU ====== -->
+            <section class="card">
+                <h2>🔒 Đổi mật khẩu</h2>
+                <p class="card-desc">Nhập mật khẩu hiện tại để xác minh, rồi đặt mật khẩu mới.</p>
+                <form id="passwordForm">
+                    <div class="field">
+                        <label for="currentPassword">Mật khẩu hiện tại</label>
+                        <div class="password-wrapper">
+                            <input type="password" id="currentPassword" placeholder="Mật khẩu hiện tại" autocomplete="current-password" required>
+                            <button type="button" class="toggle-pw-btn" data-target="currentPassword" aria-label="Hiện mật khẩu">👁</button>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label for="newPassword">Mật khẩu mới</label>
+                        <div class="password-wrapper">
+                            <input type="password" id="newPassword" placeholder="Tối thiểu 6 ký tự" autocomplete="new-password" minlength="6" required>
+                            <button type="button" class="toggle-pw-btn" data-target="newPassword" aria-label="Hiện mật khẩu">👁</button>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label for="confirmPassword">Nhập lại mật khẩu mới</label>
+                        <div class="password-wrapper">
+                            <input type="password" id="confirmPassword" placeholder="Nhập lại mật khẩu mới" autocomplete="new-password" minlength="6" required>
+                            <button type="button" class="toggle-pw-btn" data-target="confirmPassword" aria-label="Hiện mật khẩu">👁</button>
+                        </div>
+                    </div>
+                    <div class="btn-row">
+                        <button type="submit" class="btn" id="savePwBtn">Đổi mật khẩu</button>
+                    </div>
+                </form>
+                <div class="message" id="pwMessage"></div>
+            </section>
+        </main>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import {
+            getAuth,
+            onAuthStateChanged,
+            updateProfile,
+            updatePassword,
+            reauthenticateWithCredential,
+            EmailAuthProvider
+        } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyA_0t95PFaeITktsCGnBQTF7pBD9Y9HhZc",
+            authDomain: "deutschlernenvn-ce368.firebaseapp.com",
+            projectId: "deutschlernenvn-ce368",
+            storageBucket: "deutschlernenvn-ce368.firebasestorage.app",
+            messagingSenderId: "1093157479291",
+            appId: "1:1093157479291:web:fa199ba7019011e5d813de",
+            measurementId: "G-HC32YTZ3YM"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+
+        const LOGIN_PAGE = "login.html";
+
+        const checkingEl = document.getElementById("checking");
+        const appContentEl = document.getElementById("appContent");
+        const displayNameInput = document.getElementById("displayName");
+        const saveNameBtn = document.getElementById("saveNameBtn");
+        const nameMessage = document.getElementById("nameMessage");
+        const passwordForm = document.getElementById("passwordForm");
+        const currentPasswordInput = document.getElementById("currentPassword");
+        const newPasswordInput = document.getElementById("newPassword");
+        const confirmPasswordInput = document.getElementById("confirmPassword");
+        const savePwBtn = document.getElementById("savePwBtn");
+        const pwMessage = document.getElementById("pwMessage");
+
+        let currentUser = null;
+
+        // ====== AUTH GUARD ======
+        onAuthStateChanged(auth, (user) => {
+            if (!user) {
+                window.location.href = LOGIN_PAGE;
+                return;
+            }
+            currentUser = user;
+            displayNameInput.value = user.displayName || "";
+            checkingEl.style.display = "none";
+            appContentEl.style.display = "block";
+        });
+
+        // ====== CHỌN THEME ======
+        const themeOptions = document.querySelectorAll(".theme-option");
+        function applyTheme(theme) {
+            document.documentElement.setAttribute("data-theme", theme);
+            localStorage.setItem("theme", theme);
+            themeOptions.forEach((opt) => {
+                opt.classList.toggle("active", opt.dataset.themeChoice === theme);
+            });
+        }
+        themeOptions.forEach((opt) => {
+            opt.addEventListener("click", () => applyTheme(opt.dataset.themeChoice));
+        });
+        // Đánh dấu theme đang dùng
+        applyTheme(localStorage.getItem("theme") || "light");
+
+        // ====== ĐỔI TÊN HIỂN THỊ ======
+        saveNameBtn.addEventListener("click", async () => {
+            const name = displayNameInput.value.trim();
+            hide(nameMessage);
+            saveNameBtn.disabled = true;
+            saveNameBtn.textContent = "Đang lưu...";
+            try {
+                await updateProfile(currentUser, { displayName: name });
+                show(nameMessage, "Đã lưu tên hiển thị!", "success");
+            } catch (err) {
+                show(nameMessage, "Không lưu được tên: " + err.code, "error");
+            }
+            saveNameBtn.disabled = false;
+            saveNameBtn.textContent = "Lưu tên";
+        });
+
+        // ====== ĐỔI MẬT KHẨU ======
+        passwordForm.addEventListener("submit", async (e) => {
+            e.preventDefault();
+            hide(pwMessage);
+
+            const currentPw = currentPasswordInput.value;
+            const newPw = newPasswordInput.value;
+            const confirmPw = confirmPasswordInput.value;
+
+            if (newPw.length < 6) {
+                show(pwMessage, "Mật khẩu mới cần ít nhất 6 ký tự.", "error");
+                return;
+            }
+            if (newPw !== confirmPw) {
+                show(pwMessage, "Mật khẩu mới nhập lại không khớp.", "error");
+                return;
+            }
+            if (newPw === currentPw) {
+                show(pwMessage, "Mật khẩu mới phải khác mật khẩu hiện tại.", "error");
+                return;
+            }
+
+            savePwBtn.disabled = true;
+            savePwBtn.textContent = "Đang đổi...";
+            try {
+                // Xác minh lại bằng mật khẩu hiện tại (Firebase yêu cầu cho thao tác nhạy cảm)
+                const credential = EmailAuthProvider.credential(currentUser.email, currentPw);
+                await reauthenticateWithCredential(currentUser, credential);
+                // Đặt mật khẩu mới
+                await updatePassword(currentUser, newPw);
+                show(pwMessage, "Đổi mật khẩu thành công!", "success");
+                passwordForm.reset();
+            } catch (err) {
+                show(pwMessage, translateError(err.code), "error");
+            }
+            savePwBtn.disabled = false;
+            savePwBtn.textContent = "Đổi mật khẩu";
+        });
+
+        // ====== HIỆN/ẨN MẬT KHẨU ======
+        document.querySelectorAll(".toggle-pw-btn").forEach((btn) => {
+            btn.addEventListener("click", () => {
+                const target = document.getElementById(btn.dataset.target);
+                const hidden = target.type === "password";
+                target.type = hidden ? "text" : "password";
+                btn.textContent = hidden ? "🙈" : "👁";
+            });
+        });
+
+        // ====== TIỆN ÍCH ======
+        function show(el, text, type) {
+            el.textContent = text;
+            el.className = "message " + type;
+        }
+        function hide(el) {
+            el.className = "message";
+            el.textContent = "";
+        }
+        function translateError(code) {
+            const map = {
+                "auth/wrong-password": "Mật khẩu hiện tại không đúng.",
+                "auth/invalid-credential": "Mật khẩu hiện tại không đúng.",
+                "auth/weak-password": "Mật khẩu mới quá yếu, cần ít nhất 6 ký tự.",
+                "auth/requires-recent-login": "Vui lòng đăng nhập lại rồi thử lại.",
+                "auth/too-many-requests": "Bạn đã thử quá nhiều lần. Vui lòng đợi một chút.",
+                "auth/network-request-failed": "Lỗi kết nối mạng. Vui lòng kiểm tra Internet."
+            };
+            return map[code] || ("Đã xảy ra lỗi: " + code);
+        }
+    </script>
+
+    <!-- Áp dụng theme sớm để tránh nhấp nháy màu -->
+    <script>
+        (function () {
+            const saved = localStorage.getItem("theme") || "light";
+            document.documentElement.setAttribute("data-theme", saved);
+        })();
+    </script>
+
+</body>
+</html>
