@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="vi" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Từ vựng - Học Tiếng Đức</title>
+    <style>
+        /* ====== HỆ THỐNG THEME (Dark / Light) ====== */
+        :root,
+        html[data-theme="light"] {
+            --bg: #f5f7fb;
+            --card-bg: #ffffff;
+            --text: #16213e;
+            --text-muted: #6b7280;
+            --border: #e8ebf2;
+            --input-bg: #ffffff;
+            --primary: #0f3460;
+            --primary-hover: #16213e;
+            --primary-soft: #e8edf7;
+            --shadow-sm: 0 1px 3px rgba(15, 52, 96, 0.06);
+            --shadow: 0 8px 24px rgba(15, 52, 96, 0.12);
+            --header-bg: rgba(255, 255, 255, 0.85);
+            --danger: #c0392b;
+            --danger-soft: #fdecea;
+            --chip-bg: #eef1f8;
+            /* Màu theo giống */
+            --der: #2563eb;
+            --die: #db2777;
+            --das: #16a34a;
+        }
+        html[data-theme="dark"] {
+            --bg: #0f1424;
+            --card-bg: #1c2336;
+            --text: #e9ecf5;
+            --text-muted: #9aa3bd;
+            --border: #2a3450;
+            --input-bg: #161c30;
+            --primary: #3b6fb5;
+            --primary-hover: #4d83cf;
+            --primary-soft: #232c44;
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
+            --shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+            --header-bg: rgba(20, 26, 44, 0.85);
+            --danger: #e57373;
+            --danger-soft: #3a2225;
+            --chip-bg: #232c44;
+            --der: #60a5fa;
+            --die: #f472b6;
+            --das: #4ade80;
+        }
+
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            transition: background 0.3s, color 0.3s;
+        }
+        #checking {
+            text-align: center;
+            color: var(--text-muted);
+            margin-top: 120px;
+            font-size: 15px;
+        }
+        #appContent { display: none; }
+
+        /* ====== HEADER ====== */
+        .site-header {
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            background: var(--header-bg);
+            backdrop-filter: saturate(180%) blur(12px);
+            border-bottom: 1px solid var(--border);
+        }
+        .header-inner {
+            max-width: 760px;
+            margin: 0 auto;
+            padding: 14px 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .back-btn {
+            width: 38px; height: 38px;
+            display: inline-flex; align-items: center; justify-content: center;
+            background: var(--card-bg);
+            color: var(--text);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 18px;
+            text-decoration: none;
+            transition: background 0.2s, border-color 0.2s, transform 0.1s;
+        }
+        .back-btn:hover { background: var(--primary-soft); border-color: var(--primary); }
+        .back-btn:active { transform: scale(0.94); }
+        .header-title { font-size: 17px; font-weight: 700; }
+
+        /* ====== NỘI DUNG ====== */
+        main {
+            max-width: 760px;
+            margin: 0 auto;
+            padding: 22px 20px 60px;
+        }
+
+        /* ====== THANH CÔNG CỤ ====== */
+        .toolbar {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+        .search-wrap { position: relative; flex: 1; }
+        .search-wrap .search-icon {
+            position: absolute; left: 13px; top: 50%; transform: translateY(-50%);
+            color: var(--text-muted); font-size: 15px; pointer-events: none;
+        }
+        #searchInput {
+            width: 100%;
+            padding: 11px 14px 11px 38px;
+            border: 1.5px solid var(--border);
+            border-radius: 12px;
+            font-size: 15px;
+            background: var(--input-bg);
+            color: var(--text);
+            outline: none;
+            font-family: inherit;
+            transition: border-color 0.2s;
+        }
+        #searchInput:focus { border-color: var(--primary); }
+        .filter-btn {
+            display: inline-flex; align-items: center; gap: 7px;
+            padding: 0 15px;
+            border: 1.5px solid var(--border);
+            border-radius: 12px;
+            background: var(--card-bg);
+            color: var(--text);
+            font-size: 14px; font-weight: 600;
+            cursor: pointer;
+            font-family: inherit;
+            white-space: nowrap;
+            transition: background 0.2s, border-color 0.2s;
+        }
+        .filter-btn:hover { background: var(--primary-soft); border-color: var(--primary); }
+        .filter-btn .count-badge {
+            background: var(--primary); color: #fff;
+            border-radius: 999px; font-size: 11px; font-weight: 700;
+            min-width: 18px; height: 18px; padding: 0 5px;
+            display: inline-flex; align-items: center; justify-content: center;
+        }
+
+        /* ====== BẢNG LỌC ====== */
+        .filter-panel {
+            display: none;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 16px;
+            margin-bottom: 14px;
+            box-shadow: var(--shadow-sm);
+        }
+        .filter-panel.open { display: block; }
+        .filter-panel .panel-title {
+            font-size: 13px; font-weight: 700; color: var(--text-muted);
+            text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px;
+        }
+        .chip-group { display: flex; flex-wrap: wrap; gap: 8px; }
+        .topic-chip {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 7px 13px;
+            border: 1.5px solid var(--border);
+            border-radius: 999px;
+            background: var(--input-bg);
+            color: var(--text);
+            font-size: 13.5px;
+            cursor: pointer;
+            user-select: none;
+            transition: background 0.15s, border-color 0.15s, color 0.15s;
+        }
+        .topic-chip.selected {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: #fff;
+        }
+        .filter-actions {
+            display: flex; gap: 10px; margin-top: 16px;
+        }
+        .filter-actions .btn { flex: 1; }
+
+        /* ====== NÚT HÀNH ĐỘNG ====== */
+        .action-row {
+            display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap;
+        }
+        .btn {
+            padding: 10px 16px;
+            border: none;
+            border-radius: 11px;
+            background: var(--primary);
+            color: #fff;
+            font-size: 14px; font-weight: 600;
+            cursor: pointer;
+            font-family: inherit;
+            transition: background 0.2s, transform 0.1s;
+            display: inline-flex; align-items: center; gap: 7px;
+        }
+        .btn:hover { background: var(--primary-hover); }
+        .btn:active { transform: scale(0.98); }
+        .btn.ghost {
+            background: var(--card-bg);
+            color: var(--text);
+            border: 1.5px solid var(--border);
+        }
+        .btn.ghost:hover { background: var(--primary-soft); border-color: var(--primary); }
+        .btn.ghost.active {
+            background: var(--primary-soft);
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+        .btn.danger-ghost { background: var(--card-bg); color: var(--danger); border: 1.5px solid var(--border); }
+        .btn.danger-ghost:hover { background: var(--danger-soft); border-color: var(--danger); }
+
+        /* ====== DANH SÁCH TỪ ====== */
+        #wordList { display: grid; gap: 12px; }
+        .word-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 16px 18px;
+            box-shadow: var(--shadow-sm);
+        }
+        .word-top {
+            display: flex; align-items: center; gap: 10px;
+        }
+        .word-de {
+            font-size: 19px; font-weight: 800; letter-spacing: -0.3px;
+            display: flex; align-items: baseline; gap: 7px; flex-wrap: wrap;
+        }
+        .gender-tag { font-weight: 800; }
+        .gender-der { color: var(--der); }
+        .gender-die { color: var(--die); }
+        .gender-das { color: var(--das); }
+        .speak-btn {
+            margin-left: auto;
+            width: 36px; height: 36px;
+            flex-shrink: 0;
+            display: inline-flex; align-items: center; justify-content: center;
+            background: var(--primary-soft);
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: transform 0.1s, background 0.2s;
+        }
+        .speak-btn:hover { background: var(--border); }
+        .speak-btn:active { transform: scale(0.9); }
+        .word-meaning { color: var(--text); font-size: 15px; margin-top: 6px; }
+        .word-example {
+            color: var(--text-muted); font-size: 14px; font-style: italic;
+            margin-top: 6px; padding-left: 10px; border-left: 2px solid var(--border);
+        }
+        .word-meta {
+            display: flex; flex-wrap: wrap; gap: 6px; align-items: center;
+            margin-top: 12px;
+        }
+        .type-badge {
+            font-size: 11.5px; font-weight: 700;
+            padding: 3px 9px; border-radius: 999px;
+            background: var(--primary-soft); color: var(--primary);
+            text-transform: uppercase; letter-spacing: 0.4px;
+        }
+        .mini-chip {
+            font-size: 12px;
+            padding: 3px 9px; border-radius: 999px;
+            background: var(--chip-bg); color: var(--text-muted);
+        }
+        .card-edit-actions {
+            display: none;
+            gap: 8px; margin-top: 14px;
+            border-top: 1px dashed var(--border); padding-top: 12px;
+        }
+        .word-card.editing .card-edit-actions { display: flex; }
+        .card-edit-actions .btn { padding: 8px 14px; font-size: 13px; }
+
+        /* ====== TRẠNG THÁI ====== */
+        .empty-state, .loading-state {
+            text-align: center; color: var(--text-muted);
+            padding: 50px 20px; font-size: 15px;
+        }
+        .empty-state .big { font-size: 40px; margin-bottom: 12px; }
+
+        /* ====== HỘP THOẠI XÁC NHẬN ====== */
+        .overlay {
+            display: none;
+            position: fixed; inset: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 100;
+            align-items: center; justify-content: center;
+            padding: 20px;
+        }
+        .overlay.open { display: flex; }
+        .dialog {
+            background: var(--card-bg);
+            border-radius: 18px;
+            padding: 24px;
+            max-width: 380px; width: 100%;
+            box-shadow: var(--shadow);
+        }
+        .dialog h3 { margin: 0 0 8px; font-size: 18px; }
+        .dialog p { margin: 0 0 20px; color: var(--text-muted); font-size: 14px; line-height: 1.5; }
+        .dialog .dialog-actions { display: flex; gap: 10px; }
+        .dialog .dialog-actions .btn { flex: 1; justify-content: center; }
+    </style>
+</head>
+<body>
+
+    <div id="checking">Đang kiểm tra đăng nhập...</div>
+
+    <div id="appContent">
+        <header class="site-header">
+            <div class="header-inner">
+                <a class="back-btn" href="home.html" title="Quay lại" aria-label="Quay lại">←</a>
+                <span class="header-title">Từ vựng</span>
+            </div>
+        </header>
+
+        <main>
+            <!-- Thanh tìm kiếm + lọc -->
+            <div class="toolbar">
+                <div class="search-wrap">
+                    <span class="search-icon">🔍</span>
+                    <input type="text" id="searchInput" placeholder="Tìm theo tiếng Đức hoặc tiếng Việt..." autocomplete="off">
+                </div>
+                <button class="filter-btn" id="filterBtn">
+                    <span>🔽 Lọc</span>
+                    <span class="count-badge" id="filterCount" style="display:none;">0</span>
+                </button>
+            </div>
+
+            <!-- Bảng lọc theo chủ đề -->
+            <div class="filter-panel" id="filterPanel">
+                <div class="panel-title">Lọc theo chủ đề</div>
+                <div class="chip-group" id="filterChips"></div>
+                <div class="filter-actions">
+                    <button class="btn ghost" id="resetFilterBtn">Đặt lại</button>
+                    <button class="btn" id="applyFilterBtn">Áp dụng</button>
+                </div>
+            </div>
+
+            <!-- Nút hành động -->
+            <div class="action-row">
+                <button class="btn" id="addBtn">➕ Thêm từ</button>
+                <button class="btn ghost" id="topicsBtn">🏷️ Chủ đề</button>
+                <button class="btn ghost" id="editModeBtn">✏️ Chỉnh sửa</button>
+            </div>
+
+            <!-- Danh sách từ -->
+            <div id="wordList"></div>
+            <div class="loading-state" id="loadingState">Đang tải từ vựng...</div>
+            <div class="empty-state" id="emptyState" style="display:none;">
+                <div class="big">📭</div>
+                <div id="emptyText">Chưa có từ nào. Bấm "Thêm từ" để bắt đầu!</div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Hộp thoại xác nhận xoá -->
+    <div class="overlay" id="deleteOverlay">
+        <div class="dialog">
+            <h3>Xoá từ này?</h3>
+            <p id="deleteText">Bạn có chắc muốn xoá từ này không? Hành động này không thể hoàn tác.</p>
+            <div class="dialog-actions">
+                <button class="btn ghost" id="cancelDeleteBtn">Huỷ</button>
+                <button class="btn" id="confirmDeleteBtn" style="background: var(--danger);">Xoá</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import {
+            getAuth, onAuthStateChanged
+        } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+        import {
+            getFirestore, collection, query, where, getDocs, doc, deleteDoc
+        } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyA_0t95PFaeITktsCGnBQTF7pBD9Y9HhZc",
+            authDomain: "deutschlernenvn-ce368.firebaseapp.com",
+            projectId: "deutschlernenvn-ce368",
+            storageBucket: "deutschlernenvn-ce368.firebasestorage.app",
+            messagingSenderId: "1093157479291",
+            appId: "1:1093157479291:web:fa199ba7019011e5d813de",
+            measurementId: "G-HC32YTZ3YM"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        const LOGIN_PAGE = "login.html";
+        const VOCAB_COLLECTION = "vocabulary";
+        const TOPICS_COLLECTION = "topics";
+        // Chủ đề "Khác" là id ảo, luôn tồn tại, không lưu trong Firestore
+        const OTHER_TOPIC = { id: "other", name: "Khác", icon: "🗂️" };
+
+        // ====== DOM ======
+        const checkingEl = document.getElementById("checking");
+        const appContentEl = document.getElementById("appContent");
+        const searchInput = document.getElementById("searchInput");
+        const filterBtn = document.getElementById("filterBtn");
+        const filterPanel = document.getElementById("filterPanel");
+        const filterChips = document.getElementById("filterChips");
+        const filterCount = document.getElementById("filterCount");
+        const resetFilterBtn = document.getElementById("resetFilterBtn");
+        const applyFilterBtn = document.getElementById("applyFilterBtn");
+        const addBtn = document.getElementById("addBtn");
+        const topicsBtn = document.getElementById("topicsBtn");
+        const editModeBtn = document.getElementById("editModeBtn");
+        const wordList = document.getElementById("wordList");
+        const loadingState = document.getElementById("loadingState");
+        const emptyState = document.getElementById("emptyState");
+        const emptyText = document.getElementById("emptyText");
+        const deleteOverlay = document.getElementById("deleteOverlay");
+        const cancelDeleteBtn = document.getElementById("cancelDeleteBtn");
+        const confirmDeleteBtn = document.getElementById("confirmDeleteBtn");
+
+        // ====== TRẠNG THÁI ======
+        let currentUid = null;
+        let allWords = [];                 // toàn bộ từ của người dùng
+        let topicMap = new Map();          // id -> {id, name, icon}
+        let selectedFilter = new Set();    // chủ đề đang chọn để lọc (đã áp dụng)
+        let draftFilter = new Set();       // lựa chọn tạm trong bảng lọc (chưa áp dụng)
+        let editMode = false;
+        let pendingDeleteId = null;
+
+        // ====== AUTH GUARD ======
+        onAuthStateChanged(auth, async (user) => {
+            if (!user) {
+                window.location.href = LOGIN_PAGE;
+                return;
+            }
+            currentUid = user.uid;
+            checkingEl.style.display = "none";
+            appContentEl.style.display = "block";
+            await loadData();
+        });
+
+        // ====== TẢI DỮ LIỆU ======
+        async function loadData() {
+            loadingState.style.display = "block";
+            try {
+                // Chủ đề
+                topicMap = new Map();
+                topicMap.set(OTHER_TOPIC.id, OTHER_TOPIC);
+                const tSnap = await getDocs(query(
+                    collection(db, TOPICS_COLLECTION), where("uid", "==", currentUid)
+                ));
+                tSnap.forEach((d) => {
+                    const t = d.data();
+                    topicMap.set(d.id, { id: d.id, name: t.name, icon: t.icon || "🏷️" });
+                });
+
+                // Từ vựng
+                const wSnap = await getDocs(query(
+                    collection(db, VOCAB_COLLECTION), where("uid", "==", currentUid)
+                ));
+                allWords = [];
+                wSnap.forEach((d) => allWords.push({ id: d.id, ...d.data() }));
+                // Sắp xếp A→Z theo bảng chữ cái tiếng Đức
+                allWords.sort((a, b) =>
+                    (a.word || "").localeCompare(b.word || "", "de", { sensitivity: "base" })
+                );
+            } catch (err) {
+                console.warn("Không tải được dữ liệu:", err);
+                allWords = [];
+            }
+            loadingState.style.display = "none";
+            renderFilterChips();
+            render();
+        }
+
+        // ====== RENDER CHIP LỌC ======
+        function renderFilterChips() {
+            filterChips.innerHTML = "";
+            // Khác đứng đầu, rồi các chủ đề người dùng
+            const topics = [OTHER_TOPIC, ...[...topicMap.values()].filter((t) => t.id !== "other")];
+            topics.forEach((t) => {
+                const chip = document.createElement("div");
+                chip.className = "topic-chip" + (draftFilter.has(t.id) ? " selected" : "");
+                chip.textContent = `${t.icon} ${t.name}`;
+                chip.addEventListener("click", () => {
+                    if (draftFilter.has(t.id)) draftFilter.delete(t.id);
+                    else draftFilter.add(t.id);
+                    chip.classList.toggle("selected");
+                });
+                filterChips.appendChild(chip);
+            });
+        }
+
+        // ====== LỌC + TÌM KIẾM + RENDER DANH SÁCH ======
+        function render() {
+            const kw = searchInput.value.trim().toLowerCase();
+            let list = allWords.filter((w) => {
+                // Tìm kiếm: khớp từ tiếng Đức HOẶC nghĩa tiếng Việt
+                const matchKw = !kw ||
+                    (w.word || "").toLowerCase().includes(kw) ||
+                    (w.meaning || "").toLowerCase().includes(kw);
+                // Lọc theo chủ đề: từ có ≥1 chủ đề trong danh sách đã chọn
+                const matchTopic = selectedFilter.size === 0 ||
+                    (w.topics || []).some((id) => selectedFilter.has(id));
+                return matchKw && matchTopic;
+            });
+
+            wordList.innerHTML = "";
+            if (allWords.length === 0) {
+                emptyState.style.display = "block";
+                emptyText.textContent = 'Chưa có từ nào. Bấm "Thêm từ" để bắt đầu!';
+                return;
+            }
+            if (list.length === 0) {
+                emptyState.style.display = "block";
+                emptyText.textContent = "Không tìm thấy từ nào khớp.";
+                return;
+            }
+            emptyState.style.display = "none";
+            list.forEach((w) => wordList.appendChild(buildCard(w)));
+        }
+
+        // ====== TẠO THẺ TỪ ======
+        function buildCard(w) {
+            const card = document.createElement("div");
+            card.className = "word-card" + (editMode ? " editing" : "");
+
+            const top = document.createElement("div");
+            top.className = "word-top";
+
+            const de = document.createElement("div");
+            de.className = "word-de";
+            if (w.type === "Nomen" && w.gender) {
+                const g = document.createElement("span");
+                g.className = "gender-tag gender-" + w.gender;
+                g.textContent = w.gender;
+                de.appendChild(g);
+            }
+            const wordSpan = document.createElement("span");
+            wordSpan.textContent = w.word || "";
+            de.appendChild(wordSpan);
+            top.appendChild(de);
+
+            const speak = document.createElement("button");
+            speak.className = "speak-btn";
+            speak.title = "Nghe phát âm";
+            speak.textContent = "🔊";
+            speak.addEventListener("click", () => speakGerman(w.word));
+            top.appendChild(speak);
+            card.appendChild(top);
+
+            if (w.meaning) {
+                const m = document.createElement("div");
+                m.className = "word-meaning";
+                m.textContent = w.meaning;
+                card.appendChild(m);
+            }
+            if (w.example) {
+                const ex = document.createElement("div");
+                ex.className = "word-example";
+                ex.textContent = w.example;
+                card.appendChild(ex);
+            }
+
+            const meta = document.createElement("div");
+            meta.className = "word-meta";
+            if (w.type) {
+                const badge = document.createElement("span");
+                badge.className = "type-badge";
+                badge.textContent = w.type;
+                meta.appendChild(badge);
+            }
+            (w.topics || []).forEach((id) => {
+                const t = topicMap.get(id);
+                if (!t) return;
+                const chip = document.createElement("span");
+                chip.className = "mini-chip";
+                chip.textContent = `${t.icon} ${t.name}`;
+                meta.appendChild(chip);
+            });
+            card.appendChild(meta);
+
+            // Nút sửa/xoá (chỉ hiện khi bật chế độ sửa)
+            const actions = document.createElement("div");
+            actions.className = "card-edit-actions";
+            const editBtn = document.createElement("button");
+            editBtn.className = "btn ghost";
+            editBtn.textContent = "✏️ Sửa";
+            editBtn.addEventListener("click", () => {
+                window.location.href = "addword.html?id=" + encodeURIComponent(w.id);
+            });
+            const delBtn = document.createElement("button");
+            delBtn.className = "btn danger-ghost";
+            delBtn.textContent = "🗑️ Xoá";
+            delBtn.addEventListener("click", () => openDeleteDialog(w));
+            actions.appendChild(editBtn);
+            actions.appendChild(delBtn);
+            card.appendChild(actions);
+
+            return card;
+        }
+
+        // ====== PHÁT ÂM TIẾNG ĐỨC (Web Speech API) ======
+        function speakGerman(text) {
+            if (!text) return;
+            if (!("speechSynthesis" in window)) {
+                alert("Trình duyệt của bạn không hỗ trợ phát âm.");
+                return;
+            }
+            window.speechSynthesis.cancel();
+            const u = new SpeechSynthesisUtterance(text);
+            u.lang = "de-DE";
+            // Ưu tiên giọng tiếng Đức nếu có
+            const deVoice = window.speechSynthesis.getVoices().find((v) => v.lang && v.lang.startsWith("de"));
+            if (deVoice) u.voice = deVoice;
+            window.speechSynthesis.speak(u);
+        }
+
+        // ====== BẢNG LỌC ======
+        filterBtn.addEventListener("click", () => {
+            const opening = !filterPanel.classList.contains("open");
+            if (opening) {
+                // Đồng bộ lựa chọn tạm với bộ lọc đang áp dụng
+                draftFilter = new Set(selectedFilter);
+                renderFilterChips();
+            }
+            filterPanel.classList.toggle("open");
+        });
+        resetFilterBtn.addEventListener("click", () => {
+            draftFilter.clear();
+            renderFilterChips();
+        });
+        applyFilterBtn.addEventListener("click", () => {
+            selectedFilter = new Set(draftFilter);
+            updateFilterCount();
+            filterPanel.classList.remove("open");
+            render();
+        });
+        function updateFilterCount() {
+            if (selectedFilter.size > 0) {
+                filterCount.style.display = "inline-flex";
+                filterCount.textContent = selectedFilter.size;
+            } else {
+                filterCount.style.display = "none";
+            }
+        }
+
+        // ====== TÌM KIẾM ======
+        searchInput.addEventListener("input", render);
+
+        // ====== CHẾ ĐỘ SỬA ======
+        editModeBtn.addEventListener("click", () => {
+            editMode = !editMode;
+            editModeBtn.classList.toggle("active", editMode);
+            editModeBtn.textContent = editMode ? "✓ Xong" : "✏️ Chỉnh sửa";
+            document.querySelectorAll(".word-card").forEach((c) => c.classList.toggle("editing", editMode));
+        });
+
+        // ====== ĐIỀU HƯỚNG ======
+        addBtn.addEventListener("click", () => { window.location.href = "addword.html"; });
+        topicsBtn.addEventListener("click", () => { window.location.href = "topics.html"; });
+
+        // ====== XOÁ TỪ ======
+        function openDeleteDialog(w) {
+            pendingDeleteId = w.id;
+            document.getElementById("deleteText").textContent =
+                `Bạn có chắc muốn xoá từ "${w.word}" không? Hành động này không thể hoàn tác.`;
+            deleteOverlay.classList.add("open");
+        }
+        cancelDeleteBtn.addEventListener("click", () => {
+            pendingDeleteId = null;
+            deleteOverlay.classList.remove("open");
+        });
+        deleteOverlay.addEventListener("click", (e) => {
+            if (e.target === deleteOverlay) {
+                pendingDeleteId = null;
+                deleteOverlay.classList.remove("open");
+            }
+        });
+        confirmDeleteBtn.addEventListener("click", async () => {
+            if (!pendingDeleteId) return;
+            confirmDeleteBtn.disabled = true;
+            confirmDeleteBtn.textContent = "Đang xoá...";
+            try {
+                await deleteDoc(doc(db, VOCAB_COLLECTION, pendingDeleteId));
+                allWords = allWords.filter((w) => w.id !== pendingDeleteId);
+                render();
+            } catch (err) {
+                alert("Không xoá được: " + (err.code || err.message));
+            }
+            confirmDeleteBtn.disabled = false;
+            confirmDeleteBtn.textContent = "Xoá";
+            pendingDeleteId = null;
+            deleteOverlay.classList.remove("open");
+        });
+
+        // Một số trình duyệt nạp danh sách giọng đọc trễ
+        if ("speechSynthesis" in window) {
+            window.speechSynthesis.onvoiceschanged = () => {};
+        }
+    </script>
+
+    <!-- Áp dụng theme sớm để tránh nhấp nháy màu -->
+    <script>
+        (function () {
+            const saved = localStorage.getItem("theme") || "light";
+            document.documentElement.setAttribute("data-theme", saved);
+        })();
+    </script>
+
+</body>
+</html>
