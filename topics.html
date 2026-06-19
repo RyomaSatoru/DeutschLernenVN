@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="vi" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chủ đề - Học Tiếng Đức</title>
+    <style>
+        /* ====== HỆ THỐNG THEME (Dark / Light) ====== */
+        :root,
+        html[data-theme="light"] {
+            --bg: #f5f7fb;
+            --card-bg: #ffffff;
+            --text: #16213e;
+            --text-muted: #6b7280;
+            --border: #e8ebf2;
+            --input-bg: #ffffff;
+            --primary: #0f3460;
+            --primary-hover: #16213e;
+            --primary-soft: #e8edf7;
+            --shadow-sm: 0 1px 3px rgba(15, 52, 96, 0.06);
+            --shadow: 0 8px 24px rgba(15, 52, 96, 0.12);
+            --header-bg: rgba(255, 255, 255, 0.85);
+            --danger: #c0392b;
+            --danger-soft: #fdecea;
+            --chip-bg: #eef1f8;
+        }
+        html[data-theme="dark"] {
+            --bg: #0f1424;
+            --card-bg: #1c2336;
+            --text: #e9ecf5;
+            --text-muted: #9aa3bd;
+            --border: #2a3450;
+            --input-bg: #161c30;
+            --primary: #3b6fb5;
+            --primary-hover: #4d83cf;
+            --primary-soft: #232c44;
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
+            --shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+            --header-bg: rgba(20, 26, 44, 0.85);
+            --danger: #e57373;
+            --danger-soft: #3a2225;
+            --chip-bg: #232c44;
+        }
+
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            transition: background 0.3s, color 0.3s;
+        }
+        #checking {
+            text-align: center;
+            color: var(--text-muted);
+            margin-top: 120px;
+            font-size: 15px;
+        }
+        #appContent { display: none; }
+
+        /* ====== HEADER ====== */
+        .site-header {
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            background: var(--header-bg);
+            backdrop-filter: saturate(180%) blur(12px);
+            border-bottom: 1px solid var(--border);
+        }
+        .header-inner {
+            max-width: 760px;
+            margin: 0 auto;
+            padding: 14px 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .back-btn {
+            width: 38px; height: 38px;
+            display: inline-flex; align-items: center; justify-content: center;
+            background: var(--card-bg);
+            color: var(--text);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 18px;
+            text-decoration: none;
+            transition: background 0.2s, border-color 0.2s, transform 0.1s;
+        }
+        .back-btn:hover { background: var(--primary-soft); border-color: var(--primary); }
+        .back-btn:active { transform: scale(0.94); }
+        .header-title { font-size: 17px; font-weight: 700; flex: 1; }
+
+        /* ====== NỘI DUNG ====== */
+        main {
+            max-width: 760px;
+            margin: 0 auto;
+            padding: 22px 20px 60px;
+        }
+
+        /* ====== NÚT HÀNH ĐỘNG ====== */
+        .action-row {
+            display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap;
+        }
+        .btn {
+            padding: 10px 16px;
+            border: none;
+            border-radius: 11px;
+            background: var(--primary);
+            color: #fff;
+            font-size: 14px; font-weight: 600;
+            cursor: pointer;
+            font-family: inherit;
+            transition: background 0.2s, transform 0.1s;
+            display: inline-flex; align-items: center; gap: 7px;
+        }
+        .btn:hover { background: var(--primary-hover); }
+        .btn:active { transform: scale(0.98); }
+        .btn.ghost {
+            background: var(--card-bg);
+            color: var(--text);
+            border: 1.5px solid var(--border);
+        }
+        .btn.ghost:hover { background: var(--primary-soft); border-color: var(--primary); }
+        .btn.ghost.active {
+            background: var(--primary-soft);
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+        .btn.danger-ghost { background: var(--card-bg); color: var(--danger); border: 1.5px solid var(--border); }
+        .btn.danger-ghost:hover { background: var(--danger-soft); border-color: var(--danger); }
+        .btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+        /* ====== DANH SÁCH CHỦ ĐỀ ====== */
+        #topicList { display: grid; gap: 12px; }
+        .topic-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 16px 18px;
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+        .topic-icon {
+            font-size: 26px;
+            width: 48px; height: 48px;
+            flex-shrink: 0;
+            display: inline-flex; align-items: center; justify-content: center;
+            background: var(--primary-soft);
+            border-radius: 12px;
+        }
+        .topic-info { flex: 1; min-width: 0; }
+        .topic-name {
+            font-size: 16px; font-weight: 700;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .topic-name .locked-tag {
+            font-size: 11px; font-weight: 700;
+            color: var(--text-muted);
+            background: var(--chip-bg);
+            padding: 2px 8px;
+            border-radius: 999px;
+        }
+        .topic-count {
+            font-size: 13px; color: var(--text-muted);
+            margin-top: 3px;
+        }
+        .topic-card-actions {
+            display: none;
+            gap: 8px; flex-shrink: 0;
+        }
+        .topic-card.editing .topic-card-actions { display: flex; }
+        .topic-card-actions .btn { padding: 8px 12px; font-size: 13px; }
+
+        /* ====== TRẠNG THÁI ====== */
+        .loading-state {
+            text-align: center; color: var(--text-muted);
+            padding: 50px 20px; font-size: 15px;
+        }
+
+        /* ====== MODAL THÊM/SỬA CHỦ ĐỀ ====== */
+        .overlay {
+            display: none;
+            position: fixed; inset: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 100;
+            align-items: center; justify-content: center;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        .overlay.open { display: flex; }
+        .dialog {
+            background: var(--card-bg);
+            border-radius: 18px;
+            padding: 24px;
+            max-width: 420px; width: 100%;
+            box-shadow: var(--shadow);
+            margin: auto;
+        }
+        .dialog h3 { margin: 0 0 18px; font-size: 18px; }
+        .dialog p { margin: 0 0 20px; color: var(--text-muted); font-size: 14px; line-height: 1.5; }
+        .field { margin-bottom: 16px; }
+        .field label {
+            display: block;
+            font-size: 13px; font-weight: 600;
+            color: var(--text);
+            margin-bottom: 6px;
+        }
+        .field input[type="text"] {
+            width: 100%;
+            padding: 11px 14px;
+            border: 1.5px solid var(--border);
+            border-radius: 10px;
+            font-size: 15px;
+            background: var(--input-bg);
+            color: var(--text);
+            outline: none;
+            font-family: inherit;
+            transition: border-color 0.2s;
+        }
+        .field input[type="text"]:focus { border-color: var(--primary); }
+        .field input.input-error { border-color: var(--danger); }
+
+        .icon-preview-row {
+            display: flex; align-items: center; gap: 12px; margin-bottom: 10px;
+        }
+        .icon-preview {
+            width: 48px; height: 48px;
+            flex-shrink: 0;
+            display: inline-flex; align-items: center; justify-content: center;
+            font-size: 24px;
+            background: var(--primary-soft);
+            border-radius: 12px;
+        }
+        .icon-preview-label { font-size: 13px; color: var(--text-muted); }
+
+        .icon-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 6px;
+            max-height: 168px;
+            overflow-y: auto;
+            padding: 4px;
+            border: 1.5px solid var(--border);
+            border-radius: 10px;
+            background: var(--input-bg);
+        }
+        .icon-option {
+            display: flex; align-items: center; justify-content: center;
+            font-size: 19px;
+            aspect-ratio: 1;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.15s, transform 0.1s;
+            user-select: none;
+        }
+        .icon-option:hover { background: var(--primary-soft); }
+        .icon-option.selected {
+            background: var(--primary);
+            transform: scale(1.05);
+        }
+
+        .field-hint {
+            font-size: 12px;
+            color: var(--danger);
+            margin-top: 5px;
+            display: none;
+        }
+        .field-hint.show { display: block; }
+
+        .dialog .dialog-actions { display: flex; gap: 10px; margin-top: 22px; }
+        .dialog .dialog-actions .btn { flex: 1; justify-content: center; }
+    </style>
+</head>
+<body>
+
+    <div id="checking">Đang kiểm tra đăng nhập...</div>
+
+    <div id="appContent">
+        <header class="site-header">
+            <div class="header-inner">
+                <a class="back-btn" href="vocab.html" title="Quay lại" aria-label="Quay lại">←</a>
+                <span class="header-title">Chủ đề</span>
+            </div>
+        </header>
+
+        <main>
+            <!-- Nút hành động -->
+            <div class="action-row">
+                <button class="btn" id="addTopicBtn">➕ Thêm chủ đề</button>
+                <button class="btn ghost" id="editModeBtn">✏️ Chỉnh sửa</button>
+            </div>
+
+            <!-- Danh sách chủ đề -->
+            <div id="topicList"></div>
+            <div class="loading-state" id="loadingState">Đang tải chủ đề...</div>
+        </main>
+    </div>
+
+    <!-- Modal Thêm / Sửa chủ đề -->
+    <div class="overlay" id="topicOverlay">
+        <div class="dialog">
+            <h3 id="topicDialogTitle">Thêm chủ đề</h3>
+
+            <div class="field">
+                <label for="topicNameInput">Tên chủ đề</label>
+                <input type="text" id="topicNameInput" placeholder="Ví dụ: Gia đình, Công việc..." maxlength="40" autocomplete="off">
+                <div class="field-hint" id="topicNameHint">Vui lòng nhập tên chủ đề.</div>
+            </div>
+
+            <div class="field">
+                <label>Icon</label>
+                <div class="icon-preview-row">
+                    <span class="icon-preview" id="iconPreview">🏷️</span>
+                    <span class="icon-preview-label">Chọn một icon bên dưới</span>
+                </div>
+                <div class="icon-grid" id="iconGrid"></div>
+            </div>
+
+            <div class="dialog-actions">
+                <button class="btn ghost" id="cancelTopicBtn">Huỷ</button>
+                <button class="btn" id="saveTopicBtn">Lưu</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal xác nhận xoá -->
+    <div class="overlay" id="deleteOverlay">
+        <div class="dialog">
+            <h3>Xoá chủ đề này?</h3>
+            <p id="deleteText">Các từ vựng thuộc chủ đề này sẽ được chuyển vào chủ đề "Khác". Hành động này không thể hoàn tác.</p>
+            <div class="dialog-actions">
+                <button class="btn ghost" id="cancelDeleteBtn">Huỷ</button>
+                <button class="btn" id="confirmDeleteBtn" style="background: var(--danger);">Xoá</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import {
+            getAuth, onAuthStateChanged
+        } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+        import {
+            getFirestore, collection, query, where, getDocs,
+            doc, addDoc, updateDoc, deleteDoc, writeBatch
+        } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyA_0t95PFaeITktsCGnBQTF7pBD9Y9HhZc",
+            authDomain: "deutschlernenvn-ce368.firebaseapp.com",
+            projectId: "deutschlernenvn-ce368",
+            storageBucket: "deutschlernenvn-ce368.firebasestorage.app",
+            messagingSenderId: "1093157479291",
+            appId: "1:1093157479291:web:fa199ba7019011e5d813de",
+            measurementId: "G-HC32YTZ3YM"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        const LOGIN_PAGE = "login.html";
+        const VOCAB_COLLECTION = "vocabulary";
+        const TOPICS_COLLECTION = "topics";
+        // Chủ đề "Khác" là id ảo, luôn tồn tại, không lưu trong Firestore, không thể xoá/sửa
+        const OTHER_TOPIC = { id: "other", name: "Khác", icon: "🗂️" };
+
+        // Bộ icon gợi ý cho chủ đề từ vựng
+        const ICON_OPTIONS = [
+            "🏷️","👨‍👩‍👧‍👦","🏠","🍽️","🛒","💼","🎓","✈️","🚗","⚽",
+            "🎵","📱","💻","🐶","🌳","🌤️","🏥","🛍️","💰","📅",
+            "🎬","📚","🧑‍🍳","☕","🍞","🎉","❤️","⏰","🏙️","🗣️"
+        ];
+
+        // ====== DOM ======
+        const checkingEl = document.getElementById("checking");
+        const appContentEl = document.getElementById("appContent");
+        const addTopicBtn = document.getElementById("addTopicBtn");
+        const editModeBtn = document.getElementById("editModeBtn");
+        const topicList = document.getElementById("topicList");
+        const loadingState = document.getElementById("loadingState");
+
+        const topicOverlay = document.getElementById("topicOverlay");
+        const topicDialogTitle = document.getElementById("topicDialogTitle");
+        const topicNameInput = document.getElementById("topicNameInput");
+        const topicNameHint = document.getElementById("topicNameHint");
+        const iconGrid = document.getElementById("iconGrid");
+        const iconPreview = document.getElementById("iconPreview");
+        const cancelTopicBtn = document.getElementById("cancelTopicBtn");
+        const saveTopicBtn = document.getElementById("saveTopicBtn");
+
+        const deleteOverlay = document.getElementById("deleteOverlay");
+        const deleteText = document.getElementById("deleteText");
+        const cancelDeleteBtn = document.getElementById("cancelDeleteBtn");
+        const confirmDeleteBtn = document.getElementById("confirmDeleteBtn");
+
+        // ====== TRẠNG THÁI ======
+        let currentUid = null;
+        let userTopics = [];        // [{id, name, icon}] CHƯA gồm "Khác"
+        let wordCountByTopic = new Map(); // id -> số từ thuộc chủ đề đó
+        let editMode = false;
+        let editingTopicId = null;  // null = đang thêm mới, có id = đang sửa
+        let selectedIcon = ICON_OPTIONS[0];
+        let pendingDeleteId = null;
+
+        // ====== AUTH GUARD ======
+        onAuthStateChanged(auth, async (user) => {
+            if (!user) {
+                window.location.href = LOGIN_PAGE;
+                return;
+            }
+            currentUid = user.uid;
+            checkingEl.style.display = "none";
+            appContentEl.style.display = "block";
+            await loadData();
+        });
+
+        // ====== TẢI DỮ LIỆU ======
+        async function loadData() {
+            loadingState.style.display = "block";
+            try {
+                const tSnap = await getDocs(query(
+                    collection(db, TOPICS_COLLECTION), where("uid", "==", currentUid)
+                ));
+                userTopics = [];
+                tSnap.forEach((d) => {
+                    const t = d.data();
+                    userTopics.push({ id: d.id, name: t.name, icon: t.icon || "🏷️" });
+                });
+                userTopics.sort((a, b) => a.name.localeCompare(b.name, "vi"));
+
+                // Đếm số từ thuộc mỗi chủ đề (gồm cả "other")
+                const wSnap = await getDocs(query(
+                    collection(db, VOCAB_COLLECTION), where("uid", "==", currentUid)
+                ));
+                wordCountByTopic = new Map();
+                wSnap.forEach((d) => {
+                    const w = d.data();
+                    const tps = (w.topics && w.topics.length) ? w.topics : ["other"];
+                    tps.forEach((id) => {
+                        wordCountByTopic.set(id, (wordCountByTopic.get(id) || 0) + 1);
+                    });
+                });
+            } catch (err) {
+                console.warn("Không tải được dữ liệu chủ đề:", err);
+                userTopics = [];
+                wordCountByTopic = new Map();
+            }
+            loadingState.style.display = "none";
+            render();
+        }
+
+        // ====== RENDER DANH SÁCH CHỦ ĐỀ ======
+        function render() {
+            topicList.innerHTML = "";
+            const allTopics = [OTHER_TOPIC, ...userTopics];
+            allTopics.forEach((t) => topicList.appendChild(buildCard(t)));
+        }
+
+        function buildCard(t) {
+            const isOther = t.id === "other";
+            const card = document.createElement("div");
+            card.className = "topic-card" + (editMode ? " editing" : "");
+
+            const icon = document.createElement("div");
+            icon.className = "topic-icon";
+            icon.textContent = t.icon;
+            card.appendChild(icon);
+
+            const info = document.createElement("div");
+            info.className = "topic-info";
+            const nameRow = document.createElement("div");
+            nameRow.className = "topic-name";
+            const nameSpan = document.createElement("span");
+            nameSpan.textContent = t.name;
+            nameRow.appendChild(nameSpan);
+            if (isOther) {
+                const tag = document.createElement("span");
+                tag.className = "locked-tag";
+                tag.textContent = "Không thể xoá";
+                nameRow.appendChild(tag);
+            }
+            info.appendChild(nameRow);
+
+            const count = document.createElement("div");
+            count.className = "topic-count";
+            const n = wordCountByTopic.get(t.id) || 0;
+            count.textContent = `${n} từ vựng`;
+            info.appendChild(count);
+            card.appendChild(info);
+
+            // Nút sửa/xoá — chủ đề "Khác" không có nút này
+            if (!isOther) {
+                const actions = document.createElement("div");
+                actions.className = "topic-card-actions";
+                const editBtn = document.createElement("button");
+                editBtn.className = "btn ghost";
+                editBtn.textContent = "✏️ Sửa";
+                editBtn.addEventListener("click", () => openEditDialog(t));
+                const delBtn = document.createElement("button");
+                delBtn.className = "btn danger-ghost";
+                delBtn.textContent = "🗑️ Xoá";
+                delBtn.addEventListener("click", () => openDeleteDialog(t));
+                actions.appendChild(editBtn);
+                actions.appendChild(delBtn);
+                card.appendChild(actions);
+            }
+
+            return card;
+        }
+
+        // ====== CHẾ ĐỘ SỬA ======
+        editModeBtn.addEventListener("click", () => {
+            editMode = !editMode;
+            editModeBtn.classList.toggle("active", editMode);
+            editModeBtn.textContent = editMode ? "✓ Xong" : "✏️ Chỉnh sửa";
+            document.querySelectorAll(".topic-card").forEach((c) => c.classList.toggle("editing", editMode));
+        });
+
+        // ====== BẢNG CHỌN ICON ======
+        function renderIconGrid() {
+            iconGrid.innerHTML = "";
+            ICON_OPTIONS.forEach((ic) => {
+                const opt = document.createElement("div");
+                opt.className = "icon-option" + (ic === selectedIcon ? " selected" : "");
+                opt.textContent = ic;
+                opt.addEventListener("click", () => {
+                    selectedIcon = ic;
+                    iconPreview.textContent = ic;
+                    iconGrid.querySelectorAll(".icon-option").forEach((el) => {
+                        el.classList.toggle("selected", el.textContent === ic);
+                    });
+                });
+                iconGrid.appendChild(opt);
+            });
+        }
+        renderIconGrid();
+
+        // ====== MỞ MODAL THÊM CHỦ ĐỀ ======
+        addTopicBtn.addEventListener("click", () => {
+            editingTopicId = null;
+            topicDialogTitle.textContent = "Thêm chủ đề";
+            topicNameInput.value = "";
+            topicNameInput.classList.remove("input-error");
+            topicNameHint.classList.remove("show");
+            selectedIcon = ICON_OPTIONS[0];
+            iconPreview.textContent = selectedIcon;
+            renderIconGrid();
+            topicOverlay.classList.add("open");
+            setTimeout(() => topicNameInput.focus(), 50);
+        });
+
+        // ====== MỞ MODAL SỬA CHỦ ĐỀ ======
+        function openEditDialog(t) {
+            editingTopicId = t.id;
+            topicDialogTitle.textContent = "Sửa chủ đề";
+            topicNameInput.value = t.name;
+            topicNameInput.classList.remove("input-error");
+            topicNameHint.classList.remove("show");
+            selectedIcon = t.icon;
+            iconPreview.textContent = selectedIcon;
+            renderIconGrid();
+            topicOverlay.classList.add("open");
+            setTimeout(() => topicNameInput.focus(), 50);
+        }
+
+        cancelTopicBtn.addEventListener("click", () => {
+            topicOverlay.classList.remove("open");
+        });
+        topicOverlay.addEventListener("click", (e) => {
+            if (e.target === topicOverlay) topicOverlay.classList.remove("open");
+        });
+
+        // ====== LƯU CHỦ ĐỀ (THÊM MỚI hoặc SỬA) ======
+        saveTopicBtn.addEventListener("click", async () => {
+            const name = topicNameInput.value.trim();
+            if (!name) {
+                topicNameInput.classList.add("input-error");
+                topicNameHint.classList.add("show");
+                topicNameInput.focus();
+                return;
+            }
+            topicNameInput.classList.remove("input-error");
+            topicNameHint.classList.remove("show");
+
+            saveTopicBtn.disabled = true;
+            saveTopicBtn.textContent = "Đang lưu...";
+
+            try {
+                if (editingTopicId) {
+                    await updateDoc(doc(db, TOPICS_COLLECTION, editingTopicId), {
+                        name: name,
+                        icon: selectedIcon
+                    });
+                    const t = userTopics.find((x) => x.id === editingTopicId);
+                    if (t) { t.name = name; t.icon = selectedIcon; }
+                    userTopics.sort((a, b) => a.name.localeCompare(b.name, "vi"));
+                } else {
+                    const docRef = await addDoc(collection(db, TOPICS_COLLECTION), {
+                        uid: currentUid,
+                        name: name,
+                        icon: selectedIcon
+                    });
+                    userTopics.push({ id: docRef.id, name, icon: selectedIcon });
+                    userTopics.sort((a, b) => a.name.localeCompare(b.name, "vi"));
+                }
+                render();
+                topicOverlay.classList.remove("open");
+            } catch (err) {
+                alert("Không lưu được chủ đề: " + (err.code || err.message));
+            }
+            saveTopicBtn.disabled = false;
+            saveTopicBtn.textContent = "Lưu";
+        });
+
+        // ====== XOÁ CHỦ ĐỀ ======
+        function openDeleteDialog(t) {
+            pendingDeleteId = t.id;
+            const n = wordCountByTopic.get(t.id) || 0;
+            deleteText.textContent = n > 0
+                ? `Chủ đề "${t.name}" có ${n} từ vựng. Các từ này sẽ được chuyển vào chủ đề "Khác". Hành động này không thể hoàn tác.`
+                : `Bạn có chắc muốn xoá chủ đề "${t.name}" không? Hành động này không thể hoàn tác.`;
+            deleteOverlay.classList.add("open");
+        }
+        cancelDeleteBtn.addEventListener("click", () => {
+            pendingDeleteId = null;
+            deleteOverlay.classList.remove("open");
+        });
+        deleteOverlay.addEventListener("click", (e) => {
+            if (e.target === deleteOverlay) {
+                pendingDeleteId = null;
+                deleteOverlay.classList.remove("open");
+            }
+        });
+        confirmDeleteBtn.addEventListener("click", async () => {
+            if (!pendingDeleteId) return;
+            const topicId = pendingDeleteId;
+            confirmDeleteBtn.disabled = true;
+            confirmDeleteBtn.textContent = "Đang xoá...";
+
+            try {
+                // 1. Tìm tất cả từ vựng của user có chứa chủ đề này
+                const wSnap = await getDocs(query(
+                    collection(db, VOCAB_COLLECTION), where("uid", "==", currentUid)
+                ));
+                const affected = [];
+                wSnap.forEach((d) => {
+                    const w = d.data();
+                    if ((w.topics || []).includes(topicId)) {
+                        affected.push({ id: d.id, topics: w.topics || [] });
+                    }
+                });
+
+                // 2. Cập nhật từng từ: bỏ chủ đề bị xoá, nếu rỗng thì thêm "other"
+                //    Dùng batch để gộp nhiều thao tác viết thành 1 lượt ghi.
+                const batch = writeBatch(db);
+                affected.forEach((w) => {
+                    let newTopics = w.topics.filter((id) => id !== topicId);
+                    if (newTopics.length === 0) newTopics = ["other"];
+                    batch.update(doc(db, VOCAB_COLLECTION, w.id), { topics: newTopics });
+                });
+                batch.delete(doc(db, TOPICS_COLLECTION, topicId));
+                await batch.commit();
+
+                // 3. Cập nhật lại dữ liệu trên trang
+                userTopics = userTopics.filter((t) => t.id !== topicId);
+                const movedCount = wordCountByTopic.get(topicId) || 0;
+                wordCountByTopic.delete(topicId);
+                if (movedCount > 0) {
+                    wordCountByTopic.set("other", (wordCountByTopic.get("other") || 0) + movedCount);
+                }
+                render();
+            } catch (err) {
+                alert("Không xoá được chủ đề: " + (err.code || err.message));
+            }
+
+            confirmDeleteBtn.disabled = false;
+            confirmDeleteBtn.textContent = "Xoá";
+            pendingDeleteId = null;
+            deleteOverlay.classList.remove("open");
+        });
+    </script>
+
+    <!-- Áp dụng theme sớm để tránh nhấp nháy màu -->
+    <script>
+        (function () {
+            const saved = localStorage.getItem("theme") || "light";
+            document.documentElement.setAttribute("data-theme", saved);
+        })();
+    </script>
+
+</body>
+</html>
