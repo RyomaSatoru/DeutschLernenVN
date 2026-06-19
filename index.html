@@ -10,43 +10,47 @@
            thuộc tính data-theme="dark" hoặc "light" trên thẻ <html>. */
         :root,
         html[data-theme="light"] {
-            --bg: #f4f6fb;
-            --bg-gradient: linear-gradient(135deg, #eef1f8 0%, #f4f6fb 100%);
+            --bg: #f5f7fb;
+            --bg-soft: #eef1f8;
             --card-bg: #ffffff;
             --text: #16213e;
             --text-muted: #6b7280;
-            --border: #e5e7eb;
+            --border: #e8ebf2;
             --primary: #0f3460;
             --primary-hover: #16213e;
-            --shadow: 0 10px 30px rgba(15, 52, 96, 0.10);
-            --accent-soft: #e8edf7;
+            --primary-soft: #e8edf7;
+            --shadow-sm: 0 1px 3px rgba(15, 52, 96, 0.06);
+            --shadow: 0 8px 24px rgba(15, 52, 96, 0.08);
+            --accent: #f59e0b;
+            --header-bg: rgba(255, 255, 255, 0.85);
         }
         html[data-theme="dark"] {
             --bg: #0f1424;
-            --bg-gradient: linear-gradient(135deg, #1a1a2e 0%, #16213e 60%, #0f1424 100%);
+            --bg-soft: #161c30;
             --card-bg: #1c2336;
             --text: #e9ecf5;
             --text-muted: #9aa3bd;
-            --border: #2c3650;
+            --border: #2a3450;
             --primary: #3b6fb5;
             --primary-hover: #4d83cf;
-            --shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
-            --accent-soft: #232c44;
+            --primary-soft: #232c44;
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
+            --shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+            --accent: #fbbf24;
+            --header-bg: rgba(20, 26, 44, 0.85);
         }
 
         * { box-sizing: border-box; }
+        html, body { height: 100%; }
         body {
             margin: 0;
             min-height: 100vh;
+            display: flex;
+            flex-direction: column;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
-            background: var(--bg-gradient);
+            background: var(--bg);
             color: var(--text);
             transition: background 0.3s, color 0.3s;
-        }
-        .wrap {
-            max-width: 720px;
-            margin: 0 auto;
-            padding: 28px 20px 60px;
         }
 
         /* Hiển thị trong khi đang kiểm tra trạng thái đăng nhập */
@@ -56,36 +60,70 @@
             margin-top: 120px;
             font-size: 15px;
         }
-        #appContent { display: none; }
+        #appContent {
+            display: none;
+            flex-direction: column;
+            flex: 1;
+        }
 
-        /* ====== THANH TRÊN CÙNG ====== */
-        .topbar {
+        /* ====== HEADER ====== */
+        .site-header {
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            background: var(--header-bg);
+            backdrop-filter: saturate(180%) blur(12px);
+            border-bottom: 1px solid var(--border);
+        }
+        .header-inner {
+            max-width: 860px;
+            margin: 0 auto;
+            padding: 14px 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 36px;
         }
         .brand {
             display: flex;
             align-items: center;
             gap: 10px;
-            font-size: 18px;
+            font-size: 17px;
             font-weight: 700;
+            letter-spacing: -0.2px;
         }
-        .brand .flag { font-size: 24px; }
-        .topbar-actions {
+        .brand .flag { font-size: 22px; }
+        .header-actions {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
         }
-        .user-email {
+        .user-chip {
+            display: flex;
+            align-items: center;
+            gap: 8px;
             font-size: 13px;
             color: var(--text-muted);
-            margin-right: 4px;
+            padding: 6px 10px 6px 6px;
+            border: 1px solid var(--border);
+            border-radius: 999px;
+            background: var(--card-bg);
+        }
+        .avatar {
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: #fff;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
         }
         .icon-btn {
-            width: 40px;
-            height: 40px;
+            width: 38px;
+            height: 38px;
             display: inline-flex;
             align-items: center;
             justify-content: center;
@@ -94,31 +132,27 @@
             border: 1px solid var(--border);
             border-radius: 10px;
             cursor: pointer;
-            font-size: 18px;
+            font-size: 17px;
             transition: background 0.2s, transform 0.1s, border-color 0.2s;
         }
-        .icon-btn:hover { background: var(--accent-soft); }
+        .icon-btn:hover { background: var(--primary-soft); border-color: var(--primary); }
         .icon-btn:active { transform: scale(0.94); }
-        .logout-btn {
-            background: transparent;
-            color: var(--text-muted);
-            border: 1px solid var(--border);
-            padding: 9px 14px;
-            border-radius: 10px;
-            cursor: pointer;
-            font-size: 13px;
-            transition: background 0.2s, color 0.2s;
-        }
-        .logout-btn:hover { background: var(--accent-soft); color: var(--text); }
 
-        /* ====== KHỐI CHÀO MỪNG ====== */
+        /* ====== NỘI DUNG CHÍNH ====== */
+        main {
+            max-width: 860px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 40px 20px 48px;
+            flex: 1;
+        }
         .hero {
-            text-align: center;
-            margin-bottom: 40px;
+            margin-bottom: 30px;
         }
         .hero h1 {
-            font-size: 30px;
-            margin: 0 0 8px;
+            font-size: 28px;
+            margin: 0 0 6px;
+            letter-spacing: -0.5px;
         }
         .hero p {
             color: var(--text-muted);
@@ -126,10 +160,59 @@
             margin: 0;
         }
 
+        .section-title {
+            font-size: 13px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            color: var(--text-muted);
+            margin: 0 0 14px;
+        }
+
+        /* ====== Ô THỐNG KÊ ====== */
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+            gap: 14px;
+            margin-bottom: 36px;
+        }
+        .stat-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+        .stat-card .stat-icon {
+            font-size: 22px;
+            width: 48px;
+            height: 48px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--primary-soft);
+            border-radius: 12px;
+            flex-shrink: 0;
+        }
+        .stat-card .stat-value {
+            font-size: 26px;
+            font-weight: 800;
+            line-height: 1.1;
+            letter-spacing: -0.5px;
+        }
+        .stat-card .stat-label {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
         /* ====== CÁC THẺ HÀNH ĐỘNG ====== */
         .actions {
             display: grid;
-            gap: 16px;
+            gap: 14px;
         }
         .action-card {
             display: flex;
@@ -142,31 +225,32 @@
             border-radius: 16px;
             padding: 22px 24px;
             cursor: pointer;
-            box-shadow: var(--shadow);
+            box-shadow: var(--shadow-sm);
             color: var(--text);
-            transition: transform 0.12s, box-shadow 0.2s, border-color 0.2s;
+            transition: transform 0.14s ease, box-shadow 0.2s, border-color 0.2s;
             font-family: inherit;
         }
         .action-card:hover {
             transform: translateY(-3px);
+            box-shadow: var(--shadow);
             border-color: var(--primary);
         }
         .action-card:active { transform: translateY(-1px); }
         .action-card .emoji {
-            font-size: 34px;
-            width: 58px;
-            height: 58px;
+            font-size: 30px;
+            width: 56px;
+            height: 56px;
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            background: var(--accent-soft);
+            background: var(--primary-soft);
             border-radius: 14px;
             flex-shrink: 0;
         }
         .action-card .label { flex: 1; }
         .action-card .label strong {
             display: block;
-            font-size: 18px;
+            font-size: 17px;
             margin-bottom: 3px;
         }
         .action-card .label span {
@@ -176,16 +260,31 @@
         .action-card .arrow {
             font-size: 20px;
             color: var(--text-muted);
+            transition: transform 0.2s;
         }
+        .action-card:hover .arrow { transform: translateX(4px); }
         .action-card.primary {
-            background: var(--primary);
-            border-color: var(--primary);
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%);
+            border-color: transparent;
             color: #fff;
         }
         .action-card.primary .emoji { background: rgba(255,255,255,0.18); }
-        .action-card.primary .label span { color: rgba(255,255,255,0.8); }
+        .action-card.primary .label span { color: rgba(255,255,255,0.82); }
         .action-card.primary .arrow { color: rgba(255,255,255,0.9); }
-        .action-card.primary:hover { background: var(--primary-hover); }
+
+        /* ====== FOOTER ====== */
+        .site-footer {
+            text-align: center;
+            font-size: 12.5px;
+            color: var(--text-muted);
+            padding: 24px 20px 30px;
+            border-top: 1px solid var(--border);
+        }
+
+        @media (max-width: 540px) {
+            .user-chip .email-text { display: none; }
+            .hero h1 { font-size: 24px; }
+        }
     </style>
 </head>
 <body>
@@ -195,24 +294,41 @@
 
     <!-- Nội dung trang chỉ hiện ra sau khi xác nhận đã đăng nhập -->
     <div id="appContent">
-        <div class="wrap">
-            <div class="topbar">
+        <header class="site-header">
+            <div class="header-inner">
                 <div class="brand">
                     <span class="flag">🇩🇪</span>
-                    <span>Học Tiếng Đức</span>
+                    <span>DeutschlernenVN</span>
                 </div>
-                <div class="topbar-actions">
-                    <span class="user-email" id="userEmail"></span>
+                <div class="header-actions">
+                    <span class="user-chip">
+                        <span class="avatar" id="avatar"></span>
+                        <span class="email-text" id="userEmail"></span>
+                    </span>
                     <button class="icon-btn" id="settingsBtn" title="Cài đặt" aria-label="Cài đặt">⚙️</button>
-                    <button class="logout-btn" id="logoutBtn">Đăng xuất</button>
+                    <button class="icon-btn" id="logoutBtn" title="Đăng xuất" aria-label="Đăng xuất">⏻</button>
+                </div>
+            </div>
+        </header>
+
+        <main>
+            <div class="hero">
+                <h1 id="greeting">Xin chào! 👋</h1>
+                <p>Hôm nay là một ngày tuyệt vời để học thêm vài từ tiếng Đức.</p>
+            </div>
+
+            <p class="section-title">Tổng quan</p>
+            <div class="stats">
+                <div class="stat-card">
+                    <span class="stat-icon">📦</span>
+                    <div>
+                        <div class="stat-value" id="wordCount">…</div>
+                        <div class="stat-label">Từ đã lưu</div>
+                    </div>
                 </div>
             </div>
 
-            <div class="hero">
-                <h1>Xin chào! 👋</h1>
-                <p>Hôm nay bạn muốn học gì?</p>
-            </div>
-
+            <p class="section-title">Bắt đầu học</p>
             <div class="actions">
                 <button class="action-card primary" id="vocabBtn">
                     <span class="emoji">📚</span>
@@ -223,7 +339,11 @@
                     <span class="arrow">→</span>
                 </button>
             </div>
-        </div>
+        </main>
+
+        <footer class="site-footer">
+            DeutschlernenVN · Học tiếng Đức theo cách của riêng bạn
+        </footer>
     </div>
 
     <script type="module">
@@ -233,6 +353,13 @@
             onAuthStateChanged,
             signOut
         } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+        import {
+            getFirestore,
+            collection,
+            query,
+            where,
+            getCountFromServer
+        } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyA_0t95PFaeITktsCGnBQTF7pBD9Y9HhZc",
@@ -246,34 +373,64 @@
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
+        const db = getFirestore(app);
 
         const LOGIN_PAGE = "login.html";
         const VOCAB_PAGE = "vocab.html";       // trang học từ vựng (sẽ làm sau)
         const SETTINGS_PAGE = "settings.html"; // trang cài đặt (sẽ làm sau)
 
+        // Tên collection lưu từ vựng. Khi làm trang học từ vựng, hãy lưu mỗi từ
+        // là 1 document trong collection này, kèm field uid = uid người dùng.
+        // Khi đó ô "Từ đã lưu" sẽ tự động hiển thị đúng số lượng.
+        const VOCAB_COLLECTION = "vocabulary";
+
         const checkingEl = document.getElementById("checking");
         const appContentEl = document.getElementById("appContent");
         const userEmailEl = document.getElementById("userEmail");
+        const avatarEl = document.getElementById("avatar");
+        const greetingEl = document.getElementById("greeting");
+        const wordCountEl = document.getElementById("wordCount");
         const logoutBtn = document.getElementById("logoutBtn");
         const settingsBtn = document.getElementById("settingsBtn");
         const vocabBtn = document.getElementById("vocabBtn");
 
         // ====== AUTH GUARD ======
-        // Nếu chưa đăng nhập -> đẩy về trang login
-        // Nếu đã đăng nhập -> hiện nội dung trang + lưu uid để dùng cho Firestore sau này
         onAuthStateChanged(auth, (user) => {
             if (!user) {
                 window.location.href = LOGIN_PAGE;
                 return;
             }
 
-            // Đã đăng nhập thành công
-            window.currentUserUid = user.uid; // dùng biến này khi đọc/ghi Firestore
-            userEmailEl.textContent = user.email;
+            window.currentUserUid = user.uid; // dùng cho Firestore sau này
+
+            // Hiển thị thông tin người dùng
+            const email = user.email || "";
+            userEmailEl.textContent = email;
+            avatarEl.textContent = email.charAt(0) || "?";
+            const namePart = email.split("@")[0] || "bạn";
+            greetingEl.textContent = `Xin chào, ${namePart}! 👋`;
 
             checkingEl.style.display = "none";
-            appContentEl.style.display = "block";
+            appContentEl.style.display = "flex";
+
+            loadWordCount(user.uid);
         });
+
+        // ====== ĐẾM SỐ TỪ ĐÃ LƯU ======
+        async function loadWordCount(uid) {
+            try {
+                const q = query(
+                    collection(db, VOCAB_COLLECTION),
+                    where("uid", "==", uid)
+                );
+                const snapshot = await getCountFromServer(q);
+                wordCountEl.textContent = snapshot.data().count;
+            } catch (err) {
+                // Chưa có dữ liệu / chưa cấu hình Firestore -> hiển thị 0
+                console.warn("Không đếm được số từ:", err);
+                wordCountEl.textContent = "0";
+            }
+        }
 
         // ====== ĐIỀU HƯỚNG ======
         vocabBtn.addEventListener("click", () => {
@@ -291,8 +448,8 @@
     </script>
 
     <!-- ====== ÁP DỤNG THEME (Dark / Light) ======
-         Đặt riêng (không phải module) và chạy sớm để tránh nhấp nháy màu.
-         Trang cài đặt sau này chỉ cần ghi localStorage.setItem("theme", "dark"/"light"). -->
+         Chạy sớm để tránh nhấp nháy màu. Trang cài đặt sau này chỉ cần ghi
+         localStorage.setItem("theme", "dark"/"light") rồi đặt lại data-theme. -->
     <script>
         (function () {
             const saved = localStorage.getItem("theme") || "light";
