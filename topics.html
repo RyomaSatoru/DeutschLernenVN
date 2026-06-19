@@ -235,7 +235,25 @@
             background: var(--primary-soft);
             border-radius: 12px;
         }
-        .icon-preview-label { font-size: 13px; color: var(--text-muted); }
+        .icon-input {
+            flex: 1;
+            padding: 11px 14px;
+            border: 1.5px solid var(--border);
+            border-radius: 10px;
+            font-size: 20px;
+            background: var(--input-bg);
+            color: var(--text);
+            outline: none;
+            font-family: inherit;
+            transition: border-color 0.2s;
+            text-align: center;
+        }
+        .icon-input:focus { border-color: var(--primary); }
+        .icon-grid-label {
+            font-size: 12.5px;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+        }
 
         .icon-grid {
             display: grid;
@@ -315,8 +333,9 @@
                 <label>Icon</label>
                 <div class="icon-preview-row">
                     <span class="icon-preview" id="iconPreview">🏷️</span>
-                    <span class="icon-preview-label">Chọn một icon bên dưới</span>
+                    <input type="text" class="icon-input" id="iconInput" placeholder="Gõ hoặc dán icon riêng tại đây" maxlength="8" autocomplete="off">
                 </div>
+                <div class="icon-grid-label">Hoặc chọn nhanh từ gợi ý</div>
                 <div class="icon-grid" id="iconGrid"></div>
             </div>
 
@@ -390,6 +409,7 @@
         const topicNameHint = document.getElementById("topicNameHint");
         const iconGrid = document.getElementById("iconGrid");
         const iconPreview = document.getElementById("iconPreview");
+        const iconInput = document.getElementById("iconInput");
         const cancelTopicBtn = document.getElementById("cancelTopicBtn");
         const saveTopicBtn = document.getElementById("saveTopicBtn");
 
@@ -531,6 +551,7 @@
                 opt.addEventListener("click", () => {
                     selectedIcon = ic;
                     iconPreview.textContent = ic;
+                    iconInput.value = ic;
                     iconGrid.querySelectorAll(".icon-option").forEach((el) => {
                         el.classList.toggle("selected", el.textContent === ic);
                     });
@@ -539,6 +560,19 @@
             });
         }
         renderIconGrid();
+
+        // ====== NHẬP ICON TÙY CHỈNH TỪ BÀN PHÍM ======
+        // Cho phép gõ/dán bất kỳ emoji nào ngoài danh sách gợi ý có sẵn.
+        iconInput.addEventListener("input", () => {
+            const raw = iconInput.value.trim();
+            // Chỉ giữ lại 1 icon (ký tự/emoji đầu tiên, emoji có thể gồm nhiều code point)
+            const firstIcon = raw ? [...raw][0] : "";
+            selectedIcon = firstIcon || ICON_OPTIONS[0];
+            iconPreview.textContent = selectedIcon;
+            iconGrid.querySelectorAll(".icon-option").forEach((el) => {
+                el.classList.toggle("selected", el.textContent === selectedIcon);
+            });
+        });
 
         // ====== MỞ MODAL THÊM CHỦ ĐỀ ======
         addTopicBtn.addEventListener("click", () => {
@@ -549,6 +583,7 @@
             topicNameHint.classList.remove("show");
             selectedIcon = ICON_OPTIONS[0];
             iconPreview.textContent = selectedIcon;
+            iconInput.value = selectedIcon;
             renderIconGrid();
             topicOverlay.classList.add("open");
             setTimeout(() => topicNameInput.focus(), 50);
@@ -563,6 +598,7 @@
             topicNameHint.classList.remove("show");
             selectedIcon = t.icon;
             iconPreview.textContent = selectedIcon;
+            iconInput.value = selectedIcon;
             renderIconGrid();
             topicOverlay.classList.add("open");
             setTimeout(() => topicNameInput.focus(), 50);
