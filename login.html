@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Đăng nhập - Học Từ Vựng Tiếng Đức</title>
+<title>Đăng nhập - Học Tiếng Đức</title>
 <style>
   * { box-sizing: border-box; }
   body {
@@ -51,6 +51,9 @@
     color: #333;
     margin-bottom: 6px;
   }
+  .password-wrapper {
+    position: relative;
+  }
   input {
     width: 100%;
     padding: 12px 14px;
@@ -60,8 +63,46 @@
     transition: border-color 0.2s;
     outline: none;
   }
+  .password-wrapper input {
+    padding-right: 44px;
+  }
   input:focus {
     border-color: #0f3460;
+  }
+  input.input-error {
+    border-color: #c0392b;
+  }
+  .toggle-pw-btn {
+    position: absolute;
+    right: 6px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 6px;
+    font-size: 17px;
+    line-height: 1;
+    color: #888;
+    user-select: none;
+  }
+  .toggle-pw-btn:hover {
+    color: #333;
+  }
+  .field-hint {
+    font-size: 12px;
+    color: #c0392b;
+    margin-top: 5px;
+    display: none;
+  }
+  .field-hint.show {
+    display: block;
+  }
+  .confirm-field {
+    display: none;
+  }
+  .confirm-field.show {
+    display: block;
   }
   button.submit-btn {
     width: 100%;
@@ -130,16 +171,29 @@
 <div class="card">
   <div class="logo">🇩🇪</div>
   <h1 id="formTitle">Đăng nhập</h1>
-  <p class="subtitle" id="formSubtitle">Học từ vựng tiếng Đức của riêng bạn</p>
+  <p class="subtitle" id="formSubtitle">Học tiếng Đức theo cách của riêng bạn</p>
 
   <form id="authForm">
     <div class="field">
       <label for="email">Email</label>
       <input type="email" id="email" placeholder="ban@example.com" required autocomplete="email">
     </div>
+
     <div class="field">
       <label for="password">Mật khẩu</label>
-      <input type="password" id="password" placeholder="Tối thiểu 6 ký tự" required autocomplete="current-password" minlength="6">
+      <div class="password-wrapper">
+        <input type="password" id="password" placeholder="Tối thiểu 6 ký tự" required autocomplete="current-password" minlength="6">
+        <button type="button" class="toggle-pw-btn" data-target="password" aria-label="Hiện mật khẩu">👁</button>
+      </div>
+    </div>
+
+    <div class="field confirm-field" id="confirmField">
+      <label for="confirmPassword">Nhập lại mật khẩu</label>
+      <div class="password-wrapper">
+        <input type="password" id="confirmPassword" placeholder="Nhập lại mật khẩu" autocomplete="new-password" minlength="6">
+        <button type="button" class="toggle-pw-btn" data-target="confirmPassword" aria-label="Hiện mật khẩu">👁</button>
+      </div>
+      <div class="field-hint" id="confirmHint">Mật khẩu nhập lại không khớp.</div>
     </div>
 
     <div class="forgot-row" id="forgotRow">
@@ -189,6 +243,9 @@
   const form = document.getElementById("authForm");
   const emailInput = document.getElementById("email");
   const passwordInput = document.getElementById("password");
+  const confirmField = document.getElementById("confirmField");
+  const confirmPasswordInput = document.getElementById("confirmPassword");
+  const confirmHint = document.getElementById("confirmHint");
   const submitBtn = document.getElementById("submitBtn");
   const messageBox = document.getElementById("message");
   const formTitle = document.getElementById("formTitle");
@@ -196,6 +253,7 @@
   const toggleText = document.getElementById("toggleText");
   const toggleLink = document.getElementById("toggleLink");
   const forgotLink = document.getElementById("forgotLink");
+  const forgotRow = document.getElementById("forgotRow");
 
   let isLoginMode = true;
 
@@ -206,41 +264,80 @@
     }
   });
 
+  // ====== NÚT ẨN/HIỆN MẬT KHẨU ======
+  document.querySelectorAll(".toggle-pw-btn").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const targetInput = document.getElementById(btn.dataset.target);
+      const isHidden = targetInput.type === "password";
+      targetInput.type = isHidden ? "text" : "password";
+      btn.textContent = isHidden ? "🙈" : "👁";
+      btn.setAttribute("aria-label", isHidden ? "Ẩn mật khẩu" : "Hiện mật khẩu");
+    });
+  });
+
+  // ====== KIỂM TRA KHỚP MẬT KHẨU REAL-TIME (chỉ áp dụng ở mode đăng ký) ======
+  function checkPasswordsMatch() {
+    if (isLoginMode) return true;
+    const match = passwordInput.value === confirmPasswordInput.value;
+    confirmHint.classList.toggle("show", !match && confirmPasswordInput.value.length > 0);
+    confirmPasswordInput.classList.toggle("input-error", !match && confirmPasswordInput.value.length > 0);
+    return match;
+  }
+  passwordInput.addEventListener("input", checkPasswordsMatch);
+  confirmPasswordInput.addEventListener("input", checkPasswordsMatch);
+
   // Chuyển đổi giữa form Đăng nhập <-> Đăng ký
   toggleLink.addEventListener("click", () => {
     isLoginMode = !isLoginMode;
     hideMessage();
+    confirmHint.classList.remove("show");
+    confirmPasswordInput.classList.remove("input-error");
+    confirmPasswordInput.value = "";
 
     if (isLoginMode) {
       formTitle.textContent = "Đăng nhập";
-      formSubtitle.textContent = "Học từ vựng tiếng Đức của riêng bạn";
+      formSubtitle.textContent = "Học tiếng Đức theo cách của riêng bạn";
       submitBtn.textContent = "Đăng nhập";
       toggleText.textContent = "Chưa có tài khoản?";
       toggleLink.textContent = "Đăng ký ngay";
-      document.getElementById("forgotRow").style.display = "block";
+      forgotRow.style.display = "block";
+      confirmField.classList.remove("show");
+      confirmPasswordInput.required = false;
     } else {
       formTitle.textContent = "Đăng ký";
-      formSubtitle.textContent = "Tạo tài khoản để lưu từ vựng của bạn";
+      formSubtitle.textContent = "Tạo tài khoản để bắt đầu học tiếng Đức";
       submitBtn.textContent = "Đăng ký";
       toggleText.textContent = "Đã có tài khoản?";
       toggleLink.textContent = "Đăng nhập";
-      document.getElementById("forgotRow").style.display = "none";
+      forgotRow.style.display = "none";
+      confirmField.classList.add("show");
+      confirmPasswordInput.required = true;
     }
   });
 
-  // Quên mật khẩu
+  // ====== QUÊN MẬT KHẨU ======
+  // Lưu ý: vì lý do bảo mật, Firebase không cho biết email có tồn tại hay không.
+  // Ta luôn hiển thị thông báo trung lập để tránh lộ thông tin tài khoản nào tồn tại.
   forgotLink.addEventListener("click", async () => {
     const email = emailInput.value.trim();
     if (!email) {
       showMessage("Vui lòng nhập email trước để khôi phục mật khẩu.", "error");
       return;
     }
+    forgotLink.textContent = "Đang gửi...";
     try {
       await sendPasswordResetEmail(auth, email);
-      showMessage("Đã gửi email khôi phục mật khẩu. Hãy kiểm tra hộp thư của bạn.", "success");
     } catch (err) {
-      showMessage(translateError(err.code), "error");
+      // Bỏ qua lỗi "không tìm thấy email" để không tiết lộ email nào đã đăng ký.
+      // Các lỗi khác (ví dụ email sai định dạng) vẫn nên báo cho người dùng.
+      if (err.code !== "auth/user-not-found") {
+        showMessage(translateError(err.code), "error");
+        forgotLink.textContent = "Quên mật khẩu?";
+        return;
+      }
     }
+    showMessage("Nếu email này đã được đăng ký, một liên kết khôi phục mật khẩu đã được gửi tới. Hãy kiểm tra cả hộp thư rác.", "success");
+    forgotLink.textContent = "Quên mật khẩu?";
   });
 
   // Submit form (đăng nhập hoặc đăng ký)
@@ -250,6 +347,14 @@
 
     const email = emailInput.value.trim();
     const password = passwordInput.value;
+
+    // Kiểm tra mật khẩu khớp khi đăng ký
+    if (!isLoginMode) {
+      if (!checkPasswordsMatch()) {
+        showMessage("Mật khẩu nhập lại không khớp. Vui lòng kiểm tra lại.", "error");
+        return;
+      }
+    }
 
     submitBtn.disabled = true;
     submitBtn.textContent = isLoginMode ? "Đang đăng nhập..." : "Đang đăng ký...";
