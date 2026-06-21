@@ -241,6 +241,7 @@
         .gender-der { color: var(--der); }
         .gender-die { color: var(--die); }
         .gender-das { color: var(--das); }
+        .sich-tag { font-weight: 800; color: var(--primary); }
         .speak-btn {
             margin-left: auto;
             width: 36px; height: 36px;
@@ -275,6 +276,54 @@
             padding: 3px 9px; border-radius: 999px;
             background: var(--chip-bg); color: var(--text-muted);
         }
+
+        /* ====== CLICK ĐỂ MỞ RỘNG XEM THÊM ====== */
+        .word-card { cursor: pointer; }
+        .expand-hint {
+            font-size: 12px; color: var(--text-muted);
+            margin-top: 10px;
+            display: flex; align-items: center; gap: 4px;
+            user-select: none;
+        }
+        .expand-hint .chevron { transition: transform 0.2s; display: inline-block; }
+        .word-card.expanded .expand-hint .chevron { transform: rotate(180deg); }
+
+        .word-details {
+            display: none;
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px dashed var(--border);
+        }
+        .word-card.expanded .word-details { display: block; }
+        .detail-row { margin-bottom: 10px; }
+        .detail-row:last-child { margin-bottom: 0; }
+        .detail-label {
+            font-size: 11.5px; font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase; letter-spacing: 0.4px;
+            margin-bottom: 6px;
+        }
+        .prep-detail-item {
+            background: var(--chip-bg);
+            border-radius: 10px;
+            padding: 10px 12px;
+            margin-bottom: 8px;
+            font-size: 13.5px;
+        }
+        .prep-detail-item:last-child { margin-bottom: 0; }
+        .prep-detail-head {
+            font-weight: 700; display: flex; align-items: center; gap: 8px;
+        }
+        .prep-case-tag {
+            font-size: 10.5px; font-weight: 700;
+            padding: 2px 7px; border-radius: 999px;
+            background: var(--primary); color: #fff;
+        }
+        .prep-detail-meaning { color: var(--text); margin-top: 4px; }
+        .prep-detail-example {
+            color: var(--text-muted); font-style: italic; margin-top: 4px;
+        }
+
         .card-edit-actions {
             display: none;
             gap: 8px; margin-top: 14px;
@@ -534,16 +583,27 @@
             const card = document.createElement("div");
             card.className = "word-card" + (editMode ? " editing" : "");
 
+            // Tương thích dữ liệu cũ: "type" (string) hoặc "types" (mảng, sau nâng cấp)
+            const types = Array.isArray(w.types) ? w.types : (w.type ? [w.type] : []);
+            const isNomen = types.includes("Nomen");
+            const isVerb = types.includes("Verb");
+
             const top = document.createElement("div");
             top.className = "word-top";
 
             const de = document.createElement("div");
             de.className = "word-de";
-            if (w.type === "Nomen" && w.gender) {
+            if (isNomen && w.gender) {
                 const g = document.createElement("span");
                 g.className = "gender-tag gender-" + w.gender;
                 g.textContent = w.gender;
                 de.appendChild(g);
+            }
+            if (isVerb && w.isReflexive) {
+                const s = document.createElement("span");
+                s.className = "sich-tag";
+                s.textContent = "sich";
+                de.appendChild(s);
             }
             const wordSpan = document.createElement("span");
             wordSpan.textContent = w.word || "";
@@ -554,10 +614,14 @@
             speak.className = "speak-btn";
             speak.title = "Nghe phát âm";
             speak.textContent = "🔊";
-            speak.addEventListener("click", () => speakGerman(w.word));
+            speak.addEventListener("click", (e) => {
+                e.stopPropagation(); // không để click lan ra card (tránh mở/đóng rộng nhầm)
+                speakGerman(buildSpeechText(w, types, isNomen, isVerb));
+            });
             top.appendChild(speak);
             card.appendChild(top);
 
+            // ====== THÔNG TIN LUÔN HIỆN: nghĩa, ví dụ, loại từ ======
             if (w.meaning) {
                 const m = document.createElement("div");
                 m.className = "word-meaning";
@@ -570,24 +634,98 @@
                 ex.textContent = w.example;
                 card.appendChild(ex);
             }
-
-            const meta = document.createElement("div");
-            meta.className = "word-meta";
-            if (w.type) {
-                const badge = document.createElement("span");
-                badge.className = "type-badge";
-                badge.textContent = w.type;
-                meta.appendChild(badge);
+            if (types.length > 0) {
+                const meta = document.createElement("div");
+                meta.className = "word-meta";
+                types.forEach((t) => {
+                    const badge = document.createElement("span");
+                    badge.className = "type-badge";
+                    badge.textContent = t;
+                    meta.appendChild(badge);
+                });
+                card.appendChild(meta);
             }
-            (w.topics || []).forEach((id) => {
-                const t = topicMap.get(id);
-                if (!t) return;
-                const chip = document.createElement("span");
-                chip.className = "mini-chip";
-                chip.textContent = `${t.icon} ${t.name}`;
-                meta.appendChild(chip);
-            });
-            card.appendChild(meta);
+
+            // ====== GỢI Ý MỞ RỘNG (chỉ hiện nếu có thông tin thêm để xem) ======
+            const hasExtra = (w.topics && w.topics.length > 0) ||
+                (isVerb && w.hasPreposition && w.prepositions && w.prepositions.length > 0);
+            if (hasExtra) {
+                const hint = document.createElement("div");
+                hint.className = "expand-hint";
+                hint.innerHTML = '<span>Xem thêm chi tiết</span><span class="chevron">▾</span>';
+                card.appendChild(hint);
+
+                // ====== PHẦN MỞ RỘNG: chủ đề, giới từ... ======
+                const details = document.createElement("div");
+                details.className = "word-details";
+
+                if (w.topics && w.topics.length > 0) {
+                    const row = document.createElement("div");
+                    row.className = "detail-row";
+                    const label = document.createElement("div");
+                    label.className = "detail-label";
+                    label.textContent = "Chủ đề";
+                    row.appendChild(label);
+                    const chipWrap = document.createElement("div");
+                    chipWrap.className = "word-meta";
+                    chipWrap.style.marginTop = "0";
+                    w.topics.forEach((id) => {
+                        const t = topicMap.get(id);
+                        if (!t) return;
+                        const chip = document.createElement("span");
+                        chip.className = "mini-chip";
+                        chip.textContent = `${t.icon} ${t.name}`;
+                        chipWrap.appendChild(chip);
+                    });
+                    row.appendChild(chipWrap);
+                    details.appendChild(row);
+                }
+
+                if (isVerb && w.hasPreposition && w.prepositions && w.prepositions.length > 0) {
+                    const row = document.createElement("div");
+                    row.className = "detail-row";
+                    const label = document.createElement("div");
+                    label.className = "detail-label";
+                    label.textContent = "Giới từ đi kèm";
+                    row.appendChild(label);
+                    w.prepositions.forEach((p) => {
+                        const item = document.createElement("div");
+                        item.className = "prep-detail-item";
+                        const head = document.createElement("div");
+                        head.className = "prep-detail-head";
+                        head.innerHTML = `<span>${escapeHtml(p.word || "")}</span>`;
+                        if (p.case) {
+                            const tag = document.createElement("span");
+                            tag.className = "prep-case-tag";
+                            tag.textContent = p.case;
+                            head.appendChild(tag);
+                        }
+                        item.appendChild(head);
+                        if (p.meaning) {
+                            const mn = document.createElement("div");
+                            mn.className = "prep-detail-meaning";
+                            mn.textContent = p.meaning;
+                            item.appendChild(mn);
+                        }
+                        if (p.example) {
+                            const ex = document.createElement("div");
+                            ex.className = "prep-detail-example";
+                            ex.textContent = p.example;
+                            item.appendChild(ex);
+                        }
+                        row.appendChild(item);
+                    });
+                    details.appendChild(row);
+                }
+
+                card.appendChild(details);
+
+                card.addEventListener("click", (e) => {
+                    if (editMode) return; // ở chế độ sửa thì không mở/đóng, tránh thao tác nhầm
+                    if (e.target.closest(".card-edit-actions")) return;
+                    card.classList.toggle("expanded");
+                });
+            }
 
             // Nút sửa/xoá (chỉ hiện khi bật chế độ sửa)
             const actions = document.createElement("div");
@@ -595,18 +733,38 @@
             const editBtn = document.createElement("button");
             editBtn.className = "btn ghost";
             editBtn.textContent = "✏️ Sửa";
-            editBtn.addEventListener("click", () => {
+            editBtn.addEventListener("click", (e) => {
+                e.stopPropagation();
                 window.location.href = "addword.html?id=" + encodeURIComponent(w.id);
             });
             const delBtn = document.createElement("button");
             delBtn.className = "btn danger-ghost";
             delBtn.textContent = "🗑️ Xoá";
-            delBtn.addEventListener("click", () => openDeleteDialog(w));
+            delBtn.addEventListener("click", (e) => {
+                e.stopPropagation();
+                openDeleteDialog(w);
+            });
             actions.appendChild(editBtn);
             actions.appendChild(delBtn);
             card.appendChild(actions);
 
             return card;
+        }
+
+        // Thoát ký tự HTML cơ bản để tránh lỗi hiển thị nếu nội dung chứa < > & ...
+        function escapeHtml(str) {
+            const div = document.createElement("div");
+            div.textContent = str;
+            return div.innerHTML;
+        }
+
+        // Ghép câu để đọc: gồm cả giống (der/die/das) và "sich" nếu có
+        function buildSpeechText(w, types, isNomen, isVerb) {
+            const parts = [];
+            if (isNomen && w.gender) parts.push(w.gender);
+            if (isVerb && w.isReflexive) parts.push("sich");
+            parts.push(w.word || "");
+            return parts.join(" ").trim();
         }
 
         // ====== PHÁT ÂM TIẾNG ĐỨC (Web Speech API) ======
