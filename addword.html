@@ -157,6 +157,100 @@
         #genderField { display: none; }
         #genderField.show { display: block; }
 
+        /* ====== TOGGLE (PHẢN THÂN / CÓ GIỚI TỪ) ====== */
+        .toggle-field {
+            display: none;
+            align-items: center; justify-content: space-between;
+            gap: 12px;
+            padding: 13px 16px;
+            border: 1.5px solid var(--border);
+            border-radius: 10px;
+            background: var(--input-bg);
+        }
+        .toggle-field.show { display: flex; }
+        .toggle-field-label { font-size: 14px; font-weight: 600; }
+        .toggle-field-sub { font-size: 12px; color: var(--text-muted); font-weight: 400; margin-top: 2px; }
+        .switch {
+            position: relative;
+            width: 46px; height: 26px;
+            flex-shrink: 0;
+            background: var(--border);
+            border-radius: 999px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .switch.on { background: var(--primary); }
+        .switch::after {
+            content: "";
+            position: absolute;
+            top: 3px; left: 3px;
+            width: 20px; height: 20px;
+            background: #fff;
+            border-radius: 50%;
+            transition: transform 0.2s;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.25);
+        }
+        .switch.on::after { transform: translateX(20px); }
+
+        /* ====== KHỐI GIỚI TỪ (REPEATER) ====== */
+        #prepositionsField { display: none; margin-top: 14px; }
+        #prepositionsField.show { display: block; }
+        .prep-list { display: flex; flex-direction: column; gap: 14px; }
+        .prep-item {
+            border: 1.5px solid var(--border);
+            border-radius: 12px;
+            padding: 14px;
+            position: relative;
+            background: var(--input-bg);
+        }
+        .prep-item .prep-row {
+            display: flex; gap: 10px; margin-bottom: 10px;
+        }
+        .prep-item .prep-row:last-of-type { margin-bottom: 0; }
+        .prep-item input.prep-word {
+            flex: 1; min-width: 0;
+        }
+        .case-choice-group { display: flex; gap: 6px; flex-shrink: 0; }
+        .case-choice {
+            padding: 10px 12px;
+            border: 1.5px solid var(--border);
+            border-radius: 10px;
+            background: var(--card-bg);
+            color: var(--text);
+            font-size: 13px; font-weight: 600;
+            cursor: pointer; user-select: none;
+            font-family: inherit;
+            transition: background 0.15s, border-color 0.15s, color 0.15s;
+            white-space: nowrap;
+        }
+        .case-choice.selected { background: var(--primary); border-color: var(--primary); color: #fff; }
+        .prep-remove-btn {
+            position: absolute;
+            top: 10px; right: 10px;
+            width: 26px; height: 26px;
+            display: inline-flex; align-items: center; justify-content: center;
+            background: var(--danger-soft);
+            color: var(--danger);
+            border: none; border-radius: 8px;
+            cursor: pointer; font-size: 13px;
+            line-height: 1;
+        }
+        .prep-remove-btn:hover { opacity: 0.85; }
+        .prep-item label.small-label {
+            display: block; font-size: 12px; font-weight: 600;
+            color: var(--text-muted); margin-bottom: 6px;
+        }
+        .add-prep-btn {
+            display: inline-flex; align-items: center; gap: 6px;
+            margin-top: 12px;
+            background: none; border: 1.5px dashed var(--border);
+            color: var(--primary); font-size: 13.5px; font-weight: 600;
+            cursor: pointer; font-family: inherit;
+            padding: 10px 14px; border-radius: 10px;
+            width: 100%; justify-content: center;
+        }
+        .add-prep-btn:hover { background: var(--primary-soft); border-color: var(--primary); }
+
         /* ====== NÚT LƯU ====== */
         .save-row { margin-top: 26px; }
         .btn {
@@ -201,6 +295,7 @@
                         <button type="button" class="choice" data-type="Nomen">Nomen</button>
                         <button type="button" class="choice" data-type="Verb">Verb</button>
                         <button type="button" class="choice" data-type="Adj">Adj</button>
+                        <button type="button" class="choice" data-type="Adverb">Adverb</button>
                         <button type="button" class="choice" data-type="Phrase">Phrase</button>
                     </div>
                 </div>
@@ -219,6 +314,31 @@
                         <button type="button" class="choice gender" data-gender="die">die</button>
                         <button type="button" class="choice gender" data-gender="das">das</button>
                     </div>
+                </div>
+
+                <!-- Phản thân (chỉ hiện với Verb) -->
+                <div class="field toggle-field" id="reflexiveField">
+                    <div>
+                        <div class="toggle-field-label">Động từ phản thân</div>
+                        <div class="toggle-field-sub">Ví dụ: sich freuen, sich waschen...</div>
+                    </div>
+                    <div class="switch" id="reflexiveSwitch"></div>
+                </div>
+
+                <!-- Có giới từ (chỉ hiện với Verb) -->
+                <div class="field toggle-field" id="hasPrepositionField">
+                    <div>
+                        <div class="toggle-field-label">Có giới từ đi kèm</div>
+                        <div class="toggle-field-sub">Ví dụ: warten auf, denken an...</div>
+                    </div>
+                    <div class="switch" id="hasPrepositionSwitch"></div>
+                </div>
+
+                <!-- Danh sách giới từ (repeater) -->
+                <div class="field" id="prepositionsField">
+                    <label>Giới từ đi kèm <span class="req">*</span></label>
+                    <div class="prep-list" id="prepList"></div>
+                    <button type="button" class="add-prep-btn" id="addPrepBtn">➕ Thêm giới từ</button>
                 </div>
 
                 <!-- Nghĩa tiếng Việt -->
@@ -285,6 +405,13 @@
         const wordInput = document.getElementById("wordInput");
         const genderField = document.getElementById("genderField");
         const genderGroup = document.getElementById("genderGroup");
+        const reflexiveField = document.getElementById("reflexiveField");
+        const reflexiveSwitch = document.getElementById("reflexiveSwitch");
+        const hasPrepositionField = document.getElementById("hasPrepositionField");
+        const hasPrepositionSwitch = document.getElementById("hasPrepositionSwitch");
+        const prepositionsField = document.getElementById("prepositionsField");
+        const prepList = document.getElementById("prepList");
+        const addPrepBtn = document.getElementById("addPrepBtn");
         const meaningInput = document.getElementById("meaningInput");
         const exampleInput = document.getElementById("exampleInput");
         const topicGroup = document.getElementById("topicGroup");
@@ -295,10 +422,18 @@
         // ====== TRẠNG THÁI ======
         let currentUid = null;
         let editId = new URLSearchParams(location.search).get("id");  // null = thêm mới
-        let selectedType = null;
+        let selectedTypes = new Set();    // có thể chứa nhiều loại từ (chỉ Adj+Adverb được phép đi cùng)
         let selectedGender = null;
+        let isReflexive = false;          // chỉ áp dụng khi có "Verb"
+        let hasPreposition = false;       // chỉ áp dụng khi có "Verb"
+        let prepositions = [];            // [{word, case: "Akkusativ"|"Dativ"|null, meaning, example}]
         let selectedTopics = new Set();   // id chủ đề đã chọn
         let topics = [];                  // [{id,name,icon}] gồm cả Khác
+
+        // Các nhóm loại từ KHÔNG được chọn cùng nhau (mỗi nhóm tự loại trừ với nhóm khác)
+        // Adj và Adverb là cặp duy nhất được phép cùng tồn tại.
+        const SOLO_TYPES = ["Nomen", "Verb", "Phrase"];
+        const PAIR_TYPES = ["Adj", "Adverb"];
 
         // ====== AUTH GUARD ======
         onAuthStateChanged(auth, async (user) => {
@@ -328,6 +463,9 @@
             }
             renderTypeButtons();
             renderGender();
+            renderReflexiveSwitch();
+            renderPrepositionSwitch();
+            renderPrepList();
             renderTopicChips();
         }
 
@@ -359,8 +497,23 @@
                     return;
                 }
                 const w = snap.data();
-                selectedType = w.type || null;
+                // Tương thích dữ liệu cũ: "type" có thể là string đơn (trước khi nâng cấp đa chọn)
+                if (Array.isArray(w.types)) {
+                    selectedTypes = new Set(w.types);
+                } else if (w.type) {
+                    selectedTypes = new Set([w.type]);
+                } else {
+                    selectedTypes = new Set();
+                }
                 selectedGender = w.gender || null;
+                isReflexive = !!w.isReflexive;
+                hasPreposition = !!w.hasPreposition;
+                prepositions = Array.isArray(w.prepositions) ? w.prepositions.map((p) => ({
+                    word: p.word || "",
+                    case: p.case || null,
+                    meaning: p.meaning || "",
+                    example: p.example || ""
+                })) : [];
                 wordInput.value = w.word || "";
                 meaningInput.value = w.meaning || "";
                 exampleInput.value = w.example || "";
@@ -370,21 +523,49 @@
             }
         }
 
-        // ====== RENDER LOẠI TỪ ======
+        // ====== RENDER LOẠI TỪ (ĐA CHỌN CÓ GIỚI HẠN) ======
         function renderTypeButtons() {
             typeGroup.querySelectorAll(".choice").forEach((btn) => {
-                btn.classList.toggle("selected", btn.dataset.type === selectedType);
+                btn.classList.toggle("selected", selectedTypes.has(btn.dataset.type));
             });
-            // Hiện ô giống nếu là danh từ
-            genderField.classList.toggle("show", selectedType === "Nomen");
+            // Hiện ô giống nếu có chọn danh từ
+            genderField.classList.toggle("show", selectedTypes.has("Nomen"));
+            // Hiện ô phản thân / giới từ nếu có chọn động từ
+            const isVerb = selectedTypes.has("Verb");
+            reflexiveField.classList.toggle("show", isVerb);
+            hasPrepositionField.classList.toggle("show", isVerb);
+            prepositionsField.classList.toggle("show", isVerb && hasPreposition);
         }
         typeGroup.addEventListener("click", (e) => {
             const btn = e.target.closest(".choice");
             if (!btn) return;
-            selectedType = btn.dataset.type;
-            if (selectedType !== "Nomen") selectedGender = null;
+            const type = btn.dataset.type;
+
+            if (selectedTypes.has(type)) {
+                // Bỏ chọn
+                selectedTypes.delete(type);
+            } else {
+                // Adj/Adverb là cặp duy nhất được phép cùng tồn tại.
+                // Các loại còn lại (Nomen/Verb/Phrase) loại trừ lẫn nhau và loại trừ với Adj/Adverb.
+                if (SOLO_TYPES.includes(type)) {
+                    selectedTypes.clear();
+                } else if (PAIR_TYPES.includes(type)) {
+                    // Bỏ các loại "solo" đang chọn (không thể đi cùng Adj/Adverb)
+                    SOLO_TYPES.forEach((t) => selectedTypes.delete(t));
+                }
+                selectedTypes.add(type);
+            }
+
+            if (!selectedTypes.has("Nomen")) selectedGender = null;
+            if (!selectedTypes.has("Verb")) {
+                isReflexive = false;
+                hasPreposition = false;
+            }
             renderTypeButtons();
             renderGender();
+            renderReflexiveSwitch();
+            renderPrepositionSwitch();
+            renderPrepList();
         });
 
         // ====== RENDER GIỐNG ======
@@ -398,6 +579,140 @@
             if (!btn) return;
             selectedGender = (selectedGender === btn.dataset.gender) ? null : btn.dataset.gender;
             renderGender();
+        });
+
+        // ====== PHẢN THÂN (TOGGLE) ======
+        function renderReflexiveSwitch() {
+            reflexiveSwitch.classList.toggle("on", isReflexive);
+        }
+        reflexiveSwitch.addEventListener("click", () => {
+            isReflexive = !isReflexive;
+            renderReflexiveSwitch();
+        });
+
+        // ====== CÓ GIỚI TỪ (TOGGLE) ======
+        function renderPrepositionSwitch() {
+            hasPrepositionSwitch.classList.toggle("on", hasPreposition);
+            prepositionsField.classList.toggle("show", selectedTypes.has("Verb") && hasPreposition);
+        }
+        hasPrepositionSwitch.addEventListener("click", () => {
+            hasPreposition = !hasPreposition;
+            if (hasPreposition && prepositions.length === 0) {
+                prepositions.push({ word: "", case: null, meaning: "", example: "" });
+            }
+            renderPrepositionSwitch();
+            renderPrepList();
+        });
+
+        // ====== DANH SÁCH GIỚI TỪ (REPEATER) ======
+        function renderPrepList() {
+            prepList.innerHTML = "";
+            prepositions.forEach((p, idx) => {
+                prepList.appendChild(buildPrepItem(p, idx));
+            });
+        }
+        function buildPrepItem(p, idx) {
+            const item = document.createElement("div");
+            item.className = "prep-item";
+
+            // Nút xoá (chỉ hiện nếu có nhiều hơn 1 dòng)
+            if (prepositions.length > 1) {
+                const removeBtn = document.createElement("button");
+                removeBtn.type = "button";
+                removeBtn.className = "prep-remove-btn";
+                removeBtn.textContent = "✕";
+                removeBtn.title = "Xoá giới từ này";
+                removeBtn.addEventListener("click", () => {
+                    prepositions.splice(idx, 1);
+                    renderPrepList();
+                });
+                item.appendChild(removeBtn);
+            }
+
+            // Dòng 1: giới từ + chọn cách (Akkusativ/Dativ)
+            const row1 = document.createElement("div");
+            row1.className = "prep-row";
+
+            const wordWrap = document.createElement("div");
+            wordWrap.style.flex = "1";
+            const wordLabel = document.createElement("label");
+            wordLabel.className = "small-label";
+            wordLabel.textContent = "Giới từ *";
+            const wordInputEl = document.createElement("input");
+            wordInputEl.type = "text";
+            wordInputEl.className = "prep-word";
+            wordInputEl.placeholder = "Ví dụ: auf, an, für...";
+            wordInputEl.value = p.word;
+            wordInputEl.addEventListener("input", () => { p.word = wordInputEl.value; });
+            wordWrap.appendChild(wordLabel);
+            wordWrap.appendChild(wordInputEl);
+
+            const caseWrap = document.createElement("div");
+            const caseLabel = document.createElement("label");
+            caseLabel.className = "small-label";
+            caseLabel.textContent = "Cách *";
+            const caseGroup = document.createElement("div");
+            caseGroup.className = "case-choice-group";
+            ["Akkusativ", "Dativ"].forEach((c) => {
+                const cBtn = document.createElement("div");
+                cBtn.className = "case-choice" + (p.case === c ? " selected" : "");
+                cBtn.textContent = c;
+                cBtn.addEventListener("click", () => {
+                    p.case = (p.case === c) ? null : c;
+                    caseGroup.querySelectorAll(".case-choice").forEach((el) => {
+                        el.classList.toggle("selected", el.textContent === p.case);
+                    });
+                });
+                caseGroup.appendChild(cBtn);
+            });
+            caseWrap.appendChild(caseLabel);
+            caseWrap.appendChild(caseGroup);
+
+            row1.appendChild(wordWrap);
+            row1.appendChild(caseWrap);
+
+            // Dòng 2: nghĩa
+            const row2 = document.createElement("div");
+            row2.className = "prep-row";
+            const meaningWrap = document.createElement("div");
+            meaningWrap.style.flex = "1";
+            const meaningLabel = document.createElement("label");
+            meaningLabel.className = "small-label";
+            meaningLabel.textContent = "Nghĩa *";
+            const meaningInputEl = document.createElement("input");
+            meaningInputEl.type = "text";
+            meaningInputEl.placeholder = "Ví dụ: chờ đợi cái gì/ai";
+            meaningInputEl.value = p.meaning;
+            meaningInputEl.addEventListener("input", () => { p.meaning = meaningInputEl.value; });
+            meaningWrap.appendChild(meaningLabel);
+            meaningWrap.appendChild(meaningInputEl);
+            row2.appendChild(meaningWrap);
+
+            // Dòng 3: ví dụ (không bắt buộc)
+            const row3 = document.createElement("div");
+            row3.className = "prep-row";
+            const exampleWrap = document.createElement("div");
+            exampleWrap.style.flex = "1";
+            const exampleLabel = document.createElement("label");
+            exampleLabel.className = "small-label";
+            exampleLabel.textContent = "Ví dụ (không bắt buộc)";
+            const exampleInputEl = document.createElement("input");
+            exampleInputEl.type = "text";
+            exampleInputEl.placeholder = "Ví dụ: Ich warte auf den Bus.";
+            exampleInputEl.value = p.example;
+            exampleInputEl.addEventListener("input", () => { p.example = exampleInputEl.value; });
+            exampleWrap.appendChild(exampleLabel);
+            exampleWrap.appendChild(exampleInputEl);
+            row3.appendChild(exampleWrap);
+
+            item.appendChild(row1);
+            item.appendChild(row2);
+            item.appendChild(row3);
+            return item;
+        }
+        addPrepBtn.addEventListener("click", () => {
+            prepositions.push({ word: "", case: null, meaning: "", example: "" });
+            renderPrepList();
         });
 
         // ====== RENDER CHIP CHỦ ĐỀ ======
@@ -426,8 +741,11 @@
         function currentState() {
             return {
                 forId: editId || "",
-                type: selectedType,
+                types: [...selectedTypes],
                 gender: selectedGender,
+                isReflexive,
+                hasPreposition,
+                prepositions: prepositions.map((p) => ({ ...p })),
                 word: wordInput.value,
                 meaning: meaningInput.value,
                 example: exampleInput.value,
@@ -449,8 +767,13 @@
             } catch (e) { return null; }
         }
         function applyState(d) {
-            selectedType = d.type || null;
+            selectedTypes = new Set(d.types && d.types.length ? d.types : (d.type ? [d.type] : []));
             selectedGender = d.gender || null;
+            isReflexive = !!d.isReflexive;
+            hasPreposition = !!d.hasPreposition;
+            prepositions = Array.isArray(d.prepositions) ? d.prepositions.map((p) => ({
+                word: p.word || "", case: p.case || null, meaning: p.meaning || "", example: p.example || ""
+            })) : [];
             wordInput.value = d.word || "";
             meaningInput.value = d.meaning || "";
             exampleInput.value = d.example || "";
@@ -469,19 +792,37 @@
             const example = exampleInput.value.trim();
 
             // Kiểm tra hợp lệ
-            if (!selectedType) return showMessage("Vui lòng chọn loại từ.", "error");
+            if (selectedTypes.size === 0) return showMessage("Vui lòng chọn ít nhất một loại từ.", "error");
             if (!word) return showMessage("Vui lòng nhập từ tiếng Đức.", "error");
-            if (selectedType === "Nomen" && !selectedGender)
+            if (selectedTypes.has("Nomen") && !selectedGender)
                 return showMessage("Vui lòng chọn giống (der/die/das) cho danh từ.", "error");
             if (!meaning) return showMessage("Vui lòng nhập nghĩa tiếng Việt.", "error");
             if (selectedTopics.size === 0) return showMessage("Vui lòng chọn ít nhất một chủ đề.", "error");
 
+            // Kiểm tra giới từ (nếu Verb + có giới từ)
+            let cleanPrepositions = [];
+            if (selectedTypes.has("Verb") && hasPreposition) {
+                if (prepositions.length === 0) return showMessage("Vui lòng thêm ít nhất một giới từ.", "error");
+                for (let i = 0; i < prepositions.length; i++) {
+                    const p = prepositions[i];
+                    const w = (p.word || "").trim();
+                    const m = (p.meaning || "").trim();
+                    if (!w) return showMessage(`Vui lòng nhập giới từ ở dòng ${i + 1}.`, "error");
+                    if (!p.case) return showMessage(`Vui lòng chọn cách (Akkusativ/Dativ) cho giới từ "${w}".`, "error");
+                    if (!m) return showMessage(`Vui lòng nhập nghĩa cho giới từ "${w}".`, "error");
+                    cleanPrepositions.push({ word: w, case: p.case, meaning: m, example: (p.example || "").trim() });
+                }
+            }
+
             const data = {
                 uid: currentUid,
-                type: selectedType,
+                types: [...selectedTypes],
                 word,
                 meaning,
-                gender: selectedType === "Nomen" ? selectedGender : null,
+                gender: selectedTypes.has("Nomen") ? selectedGender : null,
+                isReflexive: selectedTypes.has("Verb") ? isReflexive : false,
+                hasPreposition: selectedTypes.has("Verb") ? hasPreposition : false,
+                prepositions: (selectedTypes.has("Verb") && hasPreposition) ? cleanPrepositions : [],
                 example,
                 topics: [...selectedTopics],
                 updatedAt: serverTimestamp()
