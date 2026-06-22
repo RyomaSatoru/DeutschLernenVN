@@ -338,6 +338,14 @@
                     </span>
                     <span class="arrow">→</span>
                 </button>
+                <button class="action-card" id="practiceBtn">
+                    <span class="emoji">🎯</span>
+                    <span class="label">
+                        <strong>Luyện tập</strong>
+                        <span>Kiểm tra lại những từ bạn đã học</span>
+                    </span>
+                    <span class="arrow">→</span>
+                </button>
             </div>
         </main>
 
@@ -377,6 +385,7 @@
 
         const LOGIN_PAGE = "login.html";
         const VOCAB_PAGE = "vocab.html";       // trang học từ vựng (sẽ làm sau)
+        const PRACTICE_PAGE = "practice.html"; // trang luyện tập (sẽ làm sau)
         const SETTINGS_PAGE = "settings.html"; // trang cài đặt (sẽ làm sau)
 
         // Tên collection lưu từ vựng. Khi làm trang học từ vựng, hãy lưu mỗi từ
@@ -393,6 +402,7 @@
         const logoutBtn = document.getElementById("logoutBtn");
         const settingsBtn = document.getElementById("settingsBtn");
         const vocabBtn = document.getElementById("vocabBtn");
+        const practiceBtn = document.getElementById("practiceBtn");
 
         // ====== AUTH GUARD ======
         onAuthStateChanged(auth, async (user) => {
@@ -448,6 +458,9 @@
         // ====== ĐIỀU HƯỚNG ======
         vocabBtn.addEventListener("click", () => {
             window.location.href = VOCAB_PAGE;
+        });
+        practiceBtn.addEventListener("click", () => {
+            window.location.href = PRACTICE_PAGE;
         });
         settingsBtn.addEventListener("click", () => {
             window.location.href = SETTINGS_PAGE;

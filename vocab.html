@@ -226,10 +226,14 @@
         .word-card {
             background: var(--card-bg);
             border: 1px solid var(--border);
+            border-left: 4px solid var(--border);
             border-radius: 16px;
             padding: 16px 18px;
             box-shadow: var(--shadow-sm);
+            transition: border-color 0.25s;
         }
+        .word-card.learned { border-left-color: #16a34a; }
+        html[data-theme="dark"] .word-card.learned { border-left-color: #4ade80; }
         .word-top {
             display: flex; align-items: center; gap: 10px;
         }
@@ -242,8 +246,34 @@
         .gender-die { color: var(--die); }
         .gender-das { color: var(--das); }
         .sich-tag { font-weight: 800; color: var(--primary); }
-        .speak-btn {
+        .top-actions {
             margin-left: auto;
+            display: flex; align-items: center; gap: 8px;
+            flex-shrink: 0;
+        }
+        .learned-btn {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 0 11px; height: 36px;
+            border: 1.5px solid var(--border);
+            border-radius: 10px;
+            background: var(--card-bg);
+            color: var(--text-muted);
+            font-size: 12.5px; font-weight: 700;
+            font-family: inherit;
+            white-space: nowrap;
+            user-select: none;
+        }
+        .learned-btn.is-learned {
+            background: rgba(22, 163, 74, 0.12);
+            border-color: #16a34a;
+            color: #16a34a;
+        }
+        html[data-theme="dark"] .learned-btn.is-learned {
+            background: rgba(74, 222, 128, 0.12);
+            border-color: #4ade80;
+            color: #4ade80;
+        }
+        .speak-btn {
             width: 36px; height: 36px;
             flex-shrink: 0;
             display: inline-flex; align-items: center; justify-content: center;
@@ -387,9 +417,15 @@
                 </button>
             </div>
 
-            <!-- Bảng lọc theo chủ đề -->
+            <!-- Bảng lọc theo chủ đề + trạng thái học -->
             <div class="filter-panel" id="filterPanel">
-                <div class="panel-title">Lọc theo chủ đề</div>
+                <div class="panel-title">Lọc theo trạng thái</div>
+                <div class="chip-group status-chip-group" id="statusFilterChips">
+                    <div class="topic-chip" data-status="learned">✅ Đã thuộc</div>
+                    <div class="topic-chip" data-status="unlearned">⭕ Chưa thuộc</div>
+                </div>
+
+                <div class="panel-title" style="margin-top: 16px;">Lọc theo chủ đề</div>
                 <div class="chip-group" id="filterChips"></div>
                 <div class="filter-actions">
                     <button class="btn ghost" id="resetFilterBtn">Đặt lại</button>
@@ -462,6 +498,7 @@
         const filterBtn = document.getElementById("filterBtn");
         const filterPanel = document.getElementById("filterPanel");
         const filterChips = document.getElementById("filterChips");
+        const statusFilterChips = document.getElementById("statusFilterChips");
         const filterCount = document.getElementById("filterCount");
         const resetFilterBtn = document.getElementById("resetFilterBtn");
         const applyFilterBtn = document.getElementById("applyFilterBtn");
@@ -482,6 +519,8 @@
         let topicMap = new Map();          // id -> {id, name, icon}
         let selectedFilter = new Set();    // chủ đề đang chọn để lọc (đã áp dụng)
         let draftFilter = new Set();       // lựa chọn tạm trong bảng lọc (chưa áp dụng)
+        let selectedStatus = null;         // "learned" | "unlearned" | null (đã áp dụng)
+        let draftStatus = null;            // lựa chọn tạm trong bảng lọc (chưa áp dụng)
         let editMode = false;
         let pendingDeleteId = null;
 
@@ -549,6 +588,20 @@
             });
         }
 
+        // ====== RENDER CHIP LỌC THEO TRẠNG THÁI HỌC ======
+        function renderStatusFilterChips() {
+            statusFilterChips.querySelectorAll(".topic-chip").forEach((chip) => {
+                chip.classList.toggle("selected", chip.dataset.status === draftStatus);
+            });
+        }
+        statusFilterChips.querySelectorAll(".topic-chip").forEach((chip) => {
+            chip.addEventListener("click", () => {
+                // Bấm lại chip đang chọn để bỏ chọn (về "Tất cả")
+                draftStatus = (draftStatus === chip.dataset.status) ? null : chip.dataset.status;
+                renderStatusFilterChips();
+            });
+        });
+
         // ====== LỌC + TÌM KIẾM + RENDER DANH SÁCH ======
         function render() {
             const kw = searchInput.value.trim().toLowerCase();
@@ -560,7 +613,10 @@
                 // Lọc theo chủ đề: từ có ≥1 chủ đề trong danh sách đã chọn
                 const matchTopic = selectedFilter.size === 0 ||
                     (w.topics || []).some((id) => selectedFilter.has(id));
-                return matchKw && matchTopic;
+                // Lọc theo trạng thái học
+                const matchStatus = !selectedStatus ||
+                    (selectedStatus === "learned" ? !!w.learned : !w.learned);
+                return matchKw && matchTopic && matchStatus;
             });
 
             wordList.innerHTML = "";
@@ -581,7 +637,7 @@
         // ====== TẠO THẺ TỪ ======
         function buildCard(w) {
             const card = document.createElement("div");
-            card.className = "word-card" + (editMode ? " editing" : "");
+            card.className = "word-card" + (editMode ? " editing" : "") + (w.learned ? " learned" : "");
 
             // Tương thích dữ liệu cũ: "type" (string) hoặc "types" (mảng, sau nâng cấp)
             const types = Array.isArray(w.types) ? w.types : (w.type ? [w.type] : []);
@@ -610,6 +666,15 @@
             de.appendChild(wordSpan);
             top.appendChild(de);
 
+            const topActions = document.createElement("div");
+            topActions.className = "top-actions";
+
+            const learnedBadge = document.createElement("span");
+            learnedBadge.className = "learned-btn" + (w.learned ? " is-learned" : "");
+            learnedBadge.title = w.learned ? "Đã thuộc" : "Chưa thuộc";
+            learnedBadge.innerHTML = w.learned ? "✅ Đã thuộc" : "⭕ Chưa thuộc";
+            topActions.appendChild(learnedBadge);
+
             const speak = document.createElement("button");
             speak.className = "speak-btn";
             speak.title = "Nghe phát âm";
@@ -618,7 +683,9 @@
                 e.stopPropagation(); // không để click lan ra card (tránh mở/đóng rộng nhầm)
                 speakGerman(buildSpeechText(w, types, isNomen, isVerb));
             });
-            top.appendChild(speak);
+            topActions.appendChild(speak);
+
+            top.appendChild(topActions);
             card.appendChild(top);
 
             // ====== THÔNG TIN LUÔN HIỆN: nghĩa, ví dụ, loại từ ======
@@ -789,24 +856,30 @@
             if (opening) {
                 // Đồng bộ lựa chọn tạm với bộ lọc đang áp dụng
                 draftFilter = new Set(selectedFilter);
+                draftStatus = selectedStatus;
                 renderFilterChips();
+                renderStatusFilterChips();
             }
             filterPanel.classList.toggle("open");
         });
         resetFilterBtn.addEventListener("click", () => {
             draftFilter.clear();
+            draftStatus = null;
             renderFilterChips();
+            renderStatusFilterChips();
         });
         applyFilterBtn.addEventListener("click", () => {
             selectedFilter = new Set(draftFilter);
+            selectedStatus = draftStatus;
             updateFilterCount();
             filterPanel.classList.remove("open");
             render();
         });
         function updateFilterCount() {
-            if (selectedFilter.size > 0) {
+            const total = selectedFilter.size + (selectedStatus ? 1 : 0);
+            if (total > 0) {
                 filterCount.style.display = "inline-flex";
-                filterCount.textContent = selectedFilter.size;
+                filterCount.textContent = total;
             } else {
                 filterCount.style.display = "none";
             }
@@ -865,6 +938,25 @@
         if ("speechSynthesis" in window) {
             window.speechSynthesis.onvoiceschanged = () => {};
         }
+
+        // ====== TỰ TẢI LẠI KHI QUAY VỀ TRANG NÀY ======
+        // Khi người dùng sang trang khác (ví dụ Luyện tập) làm thay đổi trạng thái
+        // "đã thuộc" rồi bấm Back/quay lại đây, trang có thể vẫn đang nằm im trong
+        // bộ nhớ trình duyệt (bfcache) với dữ liệu cũ. Tải lại để luôn thấy đúng nhất.
+        let lastReloadAt = Date.now();
+        async function refreshIfStale() {
+            // Tránh tải lại quá dồn dập nếu nhiều sự kiện bắn cùng lúc
+            if (Date.now() - lastReloadAt < 800) return;
+            if (!currentUid) return;
+            lastReloadAt = Date.now();
+            await loadData();
+        }
+        document.addEventListener("visibilitychange", () => {
+            if (document.visibilityState === "visible") refreshIfStale();
+        });
+        window.addEventListener("pageshow", (e) => {
+            if (e.persisted) refreshIfStale();
+        });
     </script>
 
     <!-- Áp dụng theme sớm để tránh nhấp nháy màu -->

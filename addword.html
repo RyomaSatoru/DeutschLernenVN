@@ -134,7 +134,19 @@
         .choice.gender.selected[data-gender="das"] { background: var(--das); border-color: var(--das); }
 
         /* ====== CHIP CHỦ ĐỀ ====== */
-        .chip-group { display: flex; flex-wrap: wrap; gap: 8px; }
+        .chip-group {
+            display: flex; flex-wrap: wrap; gap: 8px;
+            max-height: 168px;
+            overflow-y: auto;
+            padding: 4px 4px 4px 2px;
+            border: 1.5px solid var(--border);
+            border-radius: 10px;
+        }
+        .chip-group::-webkit-scrollbar { width: 6px; }
+        .chip-group::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 999px;
+        }
         .topic-chip {
             display: inline-flex; align-items: center; gap: 6px;
             padding: 8px 14px;
@@ -303,7 +315,7 @@
                 <!-- Từ tiếng Đức -->
                 <div class="field">
                     <label for="wordInput">Từ tiếng Đức <span class="req">*</span></label>
-                    <input type="text" id="wordInput" placeholder="Ví dụ: Haus" autocomplete="off">
+                    <input type="text" id="wordInput" placeholder="" autocomplete="off">
                 </div>
 
                 <!-- Giống (chỉ hiện với Nomen) -->
@@ -344,13 +356,13 @@
                 <!-- Nghĩa tiếng Việt -->
                 <div class="field">
                     <label for="meaningInput">Nghĩa tiếng Việt <span class="req">*</span></label>
-                    <input type="text" id="meaningInput" placeholder="Ví dụ: ngôi nhà" autocomplete="off">
+                    <input type="text" id="meaningInput" placeholder="" autocomplete="off">
                 </div>
 
                 <!-- Ví dụ -->
                 <div class="field">
                     <label for="exampleInput">Ví dụ <span class="opt">(không bắt buộc)</span></label>
-                    <textarea id="exampleInput" placeholder="Ví dụ: Das Haus ist groß."></textarea>
+                    <textarea id="exampleInput" placeholder=""></textarea>
                 </div>
 
                 <!-- Chủ đề -->
@@ -641,7 +653,7 @@
             const wordInputEl = document.createElement("input");
             wordInputEl.type = "text";
             wordInputEl.className = "prep-word";
-            wordInputEl.placeholder = "Ví dụ: auf, an, für...";
+            wordInputEl.placeholder = "";
             wordInputEl.value = p.word;
             wordInputEl.addEventListener("input", () => { p.word = wordInputEl.value; });
             wordWrap.appendChild(wordLabel);
@@ -681,7 +693,7 @@
             meaningLabel.textContent = "Nghĩa *";
             const meaningInputEl = document.createElement("input");
             meaningInputEl.type = "text";
-            meaningInputEl.placeholder = "Ví dụ: chờ đợi cái gì/ai";
+            meaningInputEl.placeholder = "";
             meaningInputEl.value = p.meaning;
             meaningInputEl.addEventListener("input", () => { p.meaning = meaningInputEl.value; });
             meaningWrap.appendChild(meaningLabel);
@@ -698,7 +710,7 @@
             exampleLabel.textContent = "Ví dụ (không bắt buộc)";
             const exampleInputEl = document.createElement("input");
             exampleInputEl.type = "text";
-            exampleInputEl.placeholder = "Ví dụ: Ich warte auf den Bus.";
+            exampleInputEl.placeholder = "";
             exampleInputEl.value = p.example;
             exampleInputEl.addEventListener("input", () => { p.example = exampleInputEl.value; });
             exampleWrap.appendChild(exampleLabel);

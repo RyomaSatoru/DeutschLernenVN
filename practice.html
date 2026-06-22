@@ -1,0 +1,968 @@
+<!DOCTYPE html>
+<html lang="vi" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Luyện tập - Học Tiếng Đức</title>
+    <style>
+        /* ====== HỆ THỐNG THEME (Dark / Light) ====== */
+        :root,
+        html[data-theme="light"] {
+            --bg: #f5f7fb;
+            --card-bg: #ffffff;
+            --text: #16213e;
+            --text-muted: #6b7280;
+            --border: #e8ebf2;
+            --primary: #0f3460;
+            --primary-hover: #16213e;
+            --primary-soft: #e8edf7;
+            --shadow-sm: 0 1px 3px rgba(15, 52, 96, 0.06);
+            --shadow: 0 8px 24px rgba(15, 52, 96, 0.12);
+            --header-bg: rgba(255, 255, 255, 0.85);
+            --danger: #c0392b;
+            --danger-soft: #fdecea;
+            --success: #16a34a;
+            --success-soft: #e7f6ec;
+            --chip-bg: #eef1f8;
+            --der: #2563eb;
+            --die: #db2777;
+            --das: #16a34a;
+        }
+        html[data-theme="dark"] {
+            --bg: #0f1424;
+            --card-bg: #1c2336;
+            --text: #e9ecf5;
+            --text-muted: #9aa3bd;
+            --border: #2a3450;
+            --primary: #3b6fb5;
+            --primary-hover: #4d83cf;
+            --primary-soft: #232c44;
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
+            --shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+            --header-bg: rgba(20, 26, 44, 0.85);
+            --danger: #e57373;
+            --danger-soft: #3a2225;
+            --success: #4ade80;
+            --success-soft: #1c3327;
+            --chip-bg: #232c44;
+            --der: #60a5fa;
+            --die: #f472b6;
+            --das: #4ade80;
+        }
+
+        * { box-sizing: border-box; }
+        html, body { height: 100%; }
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            transition: background 0.3s, color 0.3s;
+        }
+        #checking {
+            text-align: center;
+            color: var(--text-muted);
+            margin-top: 120px;
+            font-size: 15px;
+        }
+        #appContent { display: none; flex-direction: column; min-height: 100vh; }
+
+        /* ====== HEADER ====== */
+        .site-header {
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            background: var(--header-bg);
+            backdrop-filter: saturate(180%) blur(12px);
+            border-bottom: 1px solid var(--border);
+        }
+        .header-inner {
+            max-width: 640px;
+            margin: 0 auto;
+            padding: 14px 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .back-btn {
+            width: 38px; height: 38px;
+            display: inline-flex; align-items: center; justify-content: center;
+            background: var(--card-bg);
+            color: var(--text);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 18px;
+            text-decoration: none;
+            transition: background 0.2s, border-color 0.2s, transform 0.1s;
+        }
+        .back-btn:hover { background: var(--primary-soft); border-color: var(--primary); }
+        .back-btn:active { transform: scale(0.94); }
+        .header-title { font-size: 17px; font-weight: 700; flex: 1; }
+
+        /* ====== NỘI DUNG ====== */
+        main {
+            max-width: 640px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 26px 20px 50px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ====== THANH TIẾN TRÌNH ====== */
+        .progress-row {
+            display: flex; align-items: center; gap: 12px;
+            margin-bottom: 22px;
+        }
+        .progress-count {
+            font-size: 14px; font-weight: 700;
+            color: var(--text-muted);
+            white-space: nowrap;
+            min-width: 48px;
+        }
+        .progress-track {
+            flex: 1; height: 8px;
+            background: var(--chip-bg);
+            border-radius: 999px;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            background: var(--primary);
+            border-radius: 999px;
+            transition: width 0.3s ease;
+            width: 0%;
+        }
+
+        /* ====== KHU VỰC FLASHCARD ====== */
+        .card-stage {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            perspective: 1400px;
+            margin-bottom: 26px;
+        }
+        .flashcard {
+            position: relative;
+            width: 100%;
+            min-height: 320px;
+            cursor: pointer;
+            transform-style: preserve-3d;
+            transition: transform 0.45s cubic-bezier(0.4, 0.2, 0.2, 1);
+        }
+        .flashcard.flipped { transform: rotateY(180deg); }
+        .card-face {
+            position: absolute;
+            inset: 0;
+            backface-visibility: hidden;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 22px;
+            box-shadow: var(--shadow);
+            padding: 30px 26px;
+            display: flex;
+            flex-direction: column;
+        }
+        .card-back { transform: rotateY(180deg); overflow-y: auto; }
+
+        /* ----- Mặt trước ----- */
+        .front-center {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            gap: 14px;
+        }
+        .front-word {
+            font-size: 30px; font-weight: 800; letter-spacing: -0.4px;
+            display: flex; align-items: baseline; justify-content: center;
+            gap: 9px; flex-wrap: wrap;
+        }
+        .front-word.front-word-vi {
+            font-size: 22px; font-weight: 600; color: var(--text);
+            letter-spacing: 0;
+        }
+        .gender-tag { font-weight: 800; }
+        .gender-der { color: var(--der); }
+        .gender-die { color: var(--die); }
+        .gender-das { color: var(--das); }
+        .sich-tag { font-weight: 800; color: var(--primary); }
+        .front-lang-tag {
+            font-size: 11.5px; font-weight: 700;
+            padding: 3px 10px; border-radius: 999px;
+            background: var(--primary-soft); color: var(--primary);
+            text-transform: uppercase; letter-spacing: 0.5px;
+        }
+        .flip-hint {
+            font-size: 12.5px; color: var(--text-muted);
+            display: flex; align-items: center; gap: 5px;
+            margin-top: 4px;
+        }
+
+        /* ----- Mặt sau ----- */
+        .back-header {
+            display: flex; align-items: baseline; gap: 9px; flex-wrap: wrap;
+            font-size: 22px; font-weight: 800; margin-bottom: 4px;
+        }
+        .back-meaning { font-size: 16px; color: var(--text); margin-bottom: 10px; }
+        .back-example {
+            color: var(--text-muted); font-size: 14px; font-style: italic;
+            margin-bottom: 14px; padding-left: 10px; border-left: 2px solid var(--border);
+        }
+        .type-badge {
+            font-size: 11.5px; font-weight: 700;
+            padding: 3px 9px; border-radius: 999px;
+            background: var(--primary-soft); color: var(--primary);
+            text-transform: uppercase; letter-spacing: 0.4px;
+        }
+        .mini-chip {
+            font-size: 12px;
+            padding: 3px 9px; border-radius: 999px;
+            background: var(--chip-bg); color: var(--text-muted);
+        }
+        .back-row { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
+        .detail-label {
+            font-size: 11.5px; font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase; letter-spacing: 0.4px;
+            margin-bottom: 6px;
+        }
+        .prep-detail-item {
+            background: var(--chip-bg);
+            border-radius: 10px;
+            padding: 10px 12px;
+            margin-bottom: 8px;
+            font-size: 13.5px;
+        }
+        .prep-detail-item:last-child { margin-bottom: 0; }
+        .prep-detail-head { font-weight: 700; display: flex; align-items: center; gap: 8px; }
+        .prep-case-tag {
+            font-size: 10.5px; font-weight: 700;
+            padding: 2px 7px; border-radius: 999px;
+            background: var(--primary); color: #fff;
+        }
+        .prep-detail-meaning { color: var(--text); margin-top: 4px; }
+        .prep-detail-example { color: var(--text-muted); font-style: italic; margin-top: 4px; }
+
+        /* ----- Loa (cả 2 mặt) ----- */
+        .speak-btn {
+            align-self: center;
+            width: 46px; height: 46px;
+            display: inline-flex; align-items: center; justify-content: center;
+            background: var(--primary-soft);
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 20px;
+            transition: transform 0.1s, background 0.2s;
+            flex-shrink: 0;
+        }
+        .speak-btn:hover { background: var(--border); }
+        .speak-btn:active { transform: scale(0.9); }
+        .speak-btn.small {
+            width: 34px; height: 34px; font-size: 15px;
+            position: absolute; top: 26px; right: 26px;
+        }
+
+        /* ====== NÚT THUỘC / CHƯA THUỘC ====== */
+        .answer-row {
+            display: flex; gap: 12px;
+        }
+        .answer-btn {
+            flex: 1;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+            padding: 15px 14px;
+            border-radius: 14px;
+            border: 1.5px solid var(--border);
+            background: var(--card-bg);
+            color: var(--text);
+            font-size: 15px; font-weight: 700;
+            cursor: pointer;
+            font-family: inherit;
+            transition: transform 0.1s, background 0.15s, border-color 0.15s;
+        }
+        .answer-btn:active { transform: scale(0.97); }
+        .answer-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+        .answer-btn.unlearned {
+            color: var(--danger);
+            border-color: var(--danger);
+        }
+        .answer-btn.unlearned:hover { background: var(--danger-soft); }
+        .answer-btn.learned {
+            color: var(--success);
+            border-color: var(--success);
+        }
+        .answer-btn.learned:hover { background: var(--success-soft); }
+
+        /* ====== TRẠNG THÁI: ĐANG TẢI / RỖNG / HOÀN THÀNH ====== */
+        .center-state {
+            flex: 1;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            text-align: center; gap: 14px;
+            color: var(--text-muted);
+            font-size: 15px;
+            padding: 40px 20px;
+        }
+        .center-state .big { font-size: 46px; }
+        .center-state h2 { color: var(--text); font-size: 21px; margin: 0; }
+        .center-state .btn-row { display: flex; gap: 10px; margin-top: 10px; flex-wrap: wrap; justify-content: center; }
+        .btn {
+            padding: 11px 18px;
+            border: none;
+            border-radius: 11px;
+            background: var(--primary);
+            color: #fff;
+            font-size: 14px; font-weight: 600;
+            cursor: pointer;
+            font-family: inherit;
+            transition: background 0.2s, transform 0.1s;
+            display: inline-flex; align-items: center; gap: 7px;
+        }
+        .btn:hover { background: var(--primary-hover); }
+        .btn:active { transform: scale(0.98); }
+        .btn.ghost {
+            background: var(--card-bg);
+            color: var(--text);
+            border: 1.5px solid var(--border);
+        }
+        .btn.ghost:hover { background: var(--primary-soft); border-color: var(--primary); }
+
+        /* ====== MODAL CÀI ĐẶT ====== */
+        .overlay {
+            display: none;
+            position: fixed; inset: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 100;
+            align-items: center; justify-content: center;
+            padding: 20px;
+        }
+        .overlay.open { display: flex; }
+        .dialog {
+            background: var(--card-bg);
+            border-radius: 18px;
+            padding: 24px;
+            max-width: 380px; width: 100%;
+            box-shadow: var(--shadow);
+        }
+        .dialog h3 { margin: 0 0 18px; font-size: 18px; }
+        .dialog .dialog-actions { display: flex; gap: 10px; margin-top: 20px; }
+        .dialog .dialog-actions .btn { flex: 1; justify-content: center; }
+
+        .setting-row {
+            display: flex; align-items: center; justify-content: space-between;
+            gap: 12px;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border);
+        }
+        .setting-row:last-of-type { border-bottom: none; }
+        .setting-label { font-size: 14.5px; font-weight: 600; }
+        .setting-sub { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+        .setting-hint {
+            font-size: 12px; color: var(--text-muted);
+            background: var(--chip-bg);
+            border-radius: 8px;
+            padding: 8px 10px;
+            margin: 4px 0 2px;
+            display: none;
+        }
+        .setting-hint.show { display: block; }
+
+        .switch {
+            position: relative;
+            width: 46px; height: 26px;
+            flex-shrink: 0;
+            background: var(--border);
+            border-radius: 999px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .switch.on { background: var(--primary); }
+        .switch::after {
+            content: "";
+            position: absolute;
+            top: 3px; left: 3px;
+            width: 20px; height: 20px;
+            background: #fff;
+            border-radius: 50%;
+            transition: transform 0.2s;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.25);
+        }
+        .switch.on::after { transform: translateX(20px); }
+
+        @media (max-width: 480px) {
+            .flashcard { min-height: 360px; }
+            .front-word { font-size: 25px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="checking">Đang kiểm tra đăng nhập...</div>
+
+    <div id="appContent">
+        <header class="site-header">
+            <div class="header-inner">
+                <a class="back-btn" href="home.html" title="Quay lại" aria-label="Quay lại">←</a>
+                <span class="header-title">Luyện tập · Flashcard</span>
+                <button class="back-btn" id="settingsBtn" title="Cài đặt" aria-label="Cài đặt">⚙️</button>
+            </div>
+        </header>
+
+        <main>
+            <!-- Trạng thái: đang tải -->
+            <div class="center-state" id="loadingState">
+                <div class="big">⏳</div>
+                <div>Đang tải bộ từ luyện tập...</div>
+            </div>
+
+            <!-- Trạng thái: không có từ nào -->
+            <div class="center-state" id="emptyState" style="display:none;">
+                <div class="big">📭</div>
+                <h2>Chưa có từ vựng nào</h2>
+                <div>Hãy thêm từ vựng trước khi luyện tập nhé.</div>
+                <div class="btn-row">
+                    <a class="btn" href="addword.html" style="text-decoration:none;">➕ Thêm từ</a>
+                    <a class="btn ghost" href="home.html" style="text-decoration:none;">Về trang chủ</a>
+                </div>
+            </div>
+
+            <!-- Trạng thái: đã luyện hết bộ -->
+            <div class="center-state" id="doneState" style="display:none;">
+                <div class="big">🎉</div>
+                <h2>Đã hoàn thành bộ Flashcard!</h2>
+                <div id="doneSummary"></div>
+                <div class="btn-row">
+                    <button class="btn" id="restartBtn">🔄 Luyện bộ mới</button>
+                    <a class="btn ghost" href="home.html" style="text-decoration:none;">Về trang chủ</a>
+                </div>
+            </div>
+
+            <!-- Khu vực luyện tập chính -->
+            <div id="practiceArea" style="display:none; flex: 1; display: flex; flex-direction: column;">
+                <div class="progress-row">
+                    <span class="progress-count" id="progressCount">1/20</span>
+                    <div class="progress-track">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+                </div>
+
+                <div class="card-stage">
+                    <div class="flashcard" id="flashcard">
+                        <div class="card-face card-front" id="cardFront">
+                            <button class="speak-btn small" id="speakFrontBtn" title="Nghe phát âm">🔊</button>
+                            <div class="front-center">
+                                <span class="front-lang-tag" id="frontLangTag"></span>
+                                <div class="front-word" id="frontWord"></div>
+                            </div>
+                            <div class="flip-hint"><span>👆</span><span>Bấm vào thẻ để xem chi tiết</span></div>
+                        </div>
+                        <div class="card-face card-back" id="cardBack">
+                            <button class="speak-btn small" id="speakBackBtn" title="Nghe phát âm">🔊</button>
+                            <div class="back-header" id="backWord"></div>
+                            <div class="back-meaning" id="backMeaning"></div>
+                            <div class="back-example" id="backExample" style="display:none;"></div>
+                            <div class="back-row" id="backTypes"></div>
+                            <div id="backTopicsRow" style="display:none;">
+                                <div class="detail-label">Chủ đề</div>
+                                <div class="back-row" id="backTopics"></div>
+                            </div>
+                            <div id="backPrepRow" style="display:none;">
+                                <div class="detail-label">Giới từ đi kèm</div>
+                                <div id="backPreps"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="answer-row">
+                    <button class="answer-btn unlearned" id="unlearnedBtn">⭕ Chưa thuộc</button>
+                    <button class="answer-btn learned" id="learnedBtn">✅ Đã thuộc</button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal cài đặt -->
+    <div class="overlay" id="settingsOverlay">
+        <div class="dialog">
+            <h3>Cài đặt Flashcard</h3>
+
+            <div class="setting-row">
+                <div>
+                    <div class="setting-label">🇩🇪 Tiếng Đức</div>
+                    <div class="setting-sub">Cho phép hiện ở mặt trước</div>
+                </div>
+                <div class="switch" id="toggleGerman"></div>
+            </div>
+
+            <div class="setting-row">
+                <div>
+                    <div class="setting-label">🇻🇳 Tiếng Việt</div>
+                    <div class="setting-sub">Cho phép hiện ở mặt trước</div>
+                </div>
+                <div class="switch" id="toggleVietnamese"></div>
+            </div>
+
+            <div class="setting-hint" id="settingHint"></div>
+
+            <div class="setting-row" style="margin-top: 6px;">
+                <div>
+                    <div class="setting-label">🔊 Tự động phát âm</div>
+                    <div class="setting-sub">Đọc ngay khi chuyển sang từ mới</div>
+                </div>
+                <div class="switch" id="toggleAutoSpeak"></div>
+            </div>
+
+            <div class="dialog-actions">
+                <button class="btn" id="closeSettingsBtn">Xong</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import {
+            getAuth, onAuthStateChanged
+        } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+        import {
+            getFirestore, collection, query, where, getDocs, doc, updateDoc
+        } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyA_0t95PFaeITktsCGnBQTF7pBD9Y9HhZc",
+            authDomain: "deutschlernenvn-ce368.firebaseapp.com",
+            projectId: "deutschlernenvn-ce368",
+            storageBucket: "deutschlernenvn-ce368.firebasestorage.app",
+            messagingSenderId: "1093157479291",
+            appId: "1:1093157479291:web:fa199ba7019011e5d813de",
+            measurementId: "G-HC32YTZ3YM"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        const LOGIN_PAGE = "login.html";
+        const VOCAB_COLLECTION = "vocabulary";
+        const TOPICS_COLLECTION = "topics";
+        const OTHER_TOPIC = { id: "other", name: "Khác", icon: "🗂️" };
+        const MAX_CARDS = 20; // số từ tối đa mỗi lần luyện Flashcard
+
+        // ====== DOM ======
+        const checkingEl = document.getElementById("checking");
+        const appContentEl = document.getElementById("appContent");
+        const loadingState = document.getElementById("loadingState");
+        const emptyState = document.getElementById("emptyState");
+        const doneState = document.getElementById("doneState");
+        const doneSummary = document.getElementById("doneSummary");
+        const restartBtn = document.getElementById("restartBtn");
+        const practiceArea = document.getElementById("practiceArea");
+
+        const progressCount = document.getElementById("progressCount");
+        const progressFill = document.getElementById("progressFill");
+
+        const flashcard = document.getElementById("flashcard");
+        const frontWord = document.getElementById("frontWord");
+        const frontLangTag = document.getElementById("frontLangTag");
+        const speakFrontBtn = document.getElementById("speakFrontBtn");
+
+        const backWord = document.getElementById("backWord");
+        const backMeaning = document.getElementById("backMeaning");
+        const backExample = document.getElementById("backExample");
+        const backTypes = document.getElementById("backTypes");
+        const backTopicsRow = document.getElementById("backTopicsRow");
+        const backTopics = document.getElementById("backTopics");
+        const backPrepRow = document.getElementById("backPrepRow");
+        const backPreps = document.getElementById("backPreps");
+        const speakBackBtn = document.getElementById("speakBackBtn");
+
+        const unlearnedBtn = document.getElementById("unlearnedBtn");
+        const learnedBtn = document.getElementById("learnedBtn");
+
+        const settingsBtn = document.getElementById("settingsBtn");
+        const settingsOverlay = document.getElementById("settingsOverlay");
+        const closeSettingsBtn = document.getElementById("closeSettingsBtn");
+        const toggleGerman = document.getElementById("toggleGerman");
+        const toggleVietnamese = document.getElementById("toggleVietnamese");
+        const toggleAutoSpeak = document.getElementById("toggleAutoSpeak");
+        const settingHint = document.getElementById("settingHint");
+
+        // ====== TRẠNG THÁI ======
+        let currentUid = null;
+        let topicMap = new Map();
+        let deck = [];          // bộ từ đang luyện (đã xáo trộn, tối đa MAX_CARDS)
+        let currentIndex = 0;
+        let isFlipped = false;
+        let frontIsGerman = true; // mặt trước hiện tiếng Đức (true) hay tiếng Việt (false) - random mỗi thẻ
+        let answering = false;  // chặn bấm trùng khi đang ghi Firestore
+        let learnedCountThisRound = 0;
+
+        // ====== CÀI ĐẶT (lưu vào localStorage để giữ qua các lần luyện tập) ======
+        const SETTINGS_KEY = "practiceSettings";
+        let settings = loadSettings();
+
+        function loadSettings() {
+            try {
+                const raw = localStorage.getItem(SETTINGS_KEY);
+                if (raw) {
+                    const parsed = JSON.parse(raw);
+                    return {
+                        showGerman: parsed.showGerman !== false,
+                        showVietnamese: parsed.showVietnamese !== false,
+                        autoSpeak: !!parsed.autoSpeak
+                    };
+                }
+            } catch (err) { /* dùng giá trị mặc định nếu lỗi */ }
+            return { showGerman: true, showVietnamese: true, autoSpeak: false };
+        }
+        function saveSettings() {
+            localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
+        }
+
+        // ====== AUTH GUARD ======
+        onAuthStateChanged(auth, async (user) => {
+            if (!user) {
+                window.location.href = LOGIN_PAGE;
+                return;
+            }
+            currentUid = user.uid;
+            checkingEl.style.display = "none";
+            appContentEl.style.display = "flex";
+            await startNewRound();
+        });
+
+        // ====== TẢI DỮ LIỆU + BẮT ĐẦU VÒNG MỚI ======
+        async function startNewRound() {
+            showOnly(loadingState);
+            try {
+                // Chủ đề (để hiển thị ở mặt sau)
+                topicMap = new Map();
+                topicMap.set(OTHER_TOPIC.id, OTHER_TOPIC);
+                const tSnap = await getDocs(query(
+                    collection(db, TOPICS_COLLECTION), where("uid", "==", currentUid)
+                ));
+                tSnap.forEach((d) => {
+                    const t = d.data();
+                    topicMap.set(d.id, { id: d.id, name: t.name, icon: t.icon || "🏷️" });
+                });
+
+                // Toàn bộ từ vựng của người dùng
+                const wSnap = await getDocs(query(
+                    collection(db, VOCAB_COLLECTION), where("uid", "==", currentUid)
+                ));
+                const allWords = [];
+                wSnap.forEach((d) => allWords.push({ id: d.id, ...d.data() }));
+
+                if (allWords.length === 0) {
+                    showOnly(emptyState);
+                    return;
+                }
+
+                // Xáo trộn ngẫu nhiên (Fisher-Yates) rồi lấy tối đa MAX_CARDS từ
+                shuffle(allWords);
+                deck = allWords.slice(0, MAX_CARDS);
+
+                currentIndex = 0;
+                learnedCountThisRound = 0;
+                showOnly(practiceArea);
+                renderCard();
+            } catch (err) {
+                console.warn("Không tải được dữ liệu luyện tập:", err);
+                showOnly(emptyState);
+            }
+        }
+
+        function shuffle(arr) {
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+        }
+
+        function showOnly(el) {
+            [loadingState, emptyState, doneState, practiceArea].forEach((s) => {
+                s.style.display = (s === el) ? "flex" : "none";
+            });
+        }
+
+        // ====== RENDER THẺ HIỆN TẠI ======
+        function renderCard() {
+            const w = deck[currentIndex];
+            const types = Array.isArray(w.types) ? w.types : (w.type ? [w.type] : []);
+            const isNomen = types.includes("Nomen");
+            const isVerb = types.includes("Verb");
+
+            // Bỏ lật thẻ về mặt trước khi sang từ mới
+            isFlipped = false;
+            flashcard.classList.remove("flipped");
+
+            // ----- Tạo cụm từ tiếng Đức đầy đủ (gồm der/die/das hoặc sich nếu có) -----
+            const deWordFrag = document.createElement("span");
+            if (isNomen && w.gender) {
+                const g = document.createElement("span");
+                g.className = "gender-tag gender-" + w.gender;
+                g.textContent = w.gender;
+                deWordFrag.appendChild(g);
+                deWordFrag.appendChild(document.createTextNode(" "));
+            }
+            if (isVerb && w.isReflexive) {
+                const s = document.createElement("span");
+                s.className = "sich-tag";
+                s.textContent = "sich";
+                deWordFrag.appendChild(s);
+                deWordFrag.appendChild(document.createTextNode(" "));
+            }
+            deWordFrag.appendChild(document.createTextNode(w.word || ""));
+
+            // ----- Mặt trước: hiện tiếng Đức/Việt theo cài đặt -----
+            if (settings.showGerman && settings.showVietnamese) {
+                frontIsGerman = Math.random() < 0.5;
+            } else {
+                frontIsGerman = settings.showGerman; // chỉ 1 trong 2 đang bật
+            }
+            frontWord.innerHTML = "";
+            if (frontIsGerman) {
+                frontWord.appendChild(deWordFrag.cloneNode(true));
+                frontWord.classList.remove("front-word-vi");
+                frontLangTag.textContent = "🇩🇪 Tiếng Đức";
+                speakFrontBtn.style.display = "inline-flex";
+            } else {
+                frontWord.textContent = w.meaning || "";
+                frontWord.classList.add("front-word-vi");
+                frontLangTag.textContent = "🇻🇳 Tiếng Việt";
+                speakFrontBtn.style.display = "none"; // không đọc trước khi lật, tránh lộ đáp án
+            }
+
+            // Tự động phát âm khi sang từ mới (chỉ khi mặt trước đang hiện tiếng Đức,
+            // để không lộ đáp án lúc mặt trước đang hỏi nghĩa tiếng Việt)
+            if (settings.autoSpeak && frontIsGerman) {
+                speakGerman(buildSpeechText(w));
+            }
+
+            // ----- Mặt sau: luôn hiện đầy đủ cả tiếng Đức và tiếng Việt -----
+            backWord.innerHTML = "";
+            backWord.appendChild(deWordFrag.cloneNode(true));
+            backMeaning.textContent = w.meaning || "";
+            if (w.example) {
+                backExample.textContent = w.example;
+                backExample.style.display = "block";
+            } else {
+                backExample.style.display = "none";
+            }
+
+            backTypes.innerHTML = "";
+            types.forEach((t) => {
+                const badge = document.createElement("span");
+                badge.className = "type-badge";
+                badge.textContent = t;
+                backTypes.appendChild(badge);
+            });
+
+            if (w.topics && w.topics.length > 0) {
+                backTopics.innerHTML = "";
+                w.topics.forEach((id) => {
+                    const t = topicMap.get(id);
+                    if (!t) return;
+                    const chip = document.createElement("span");
+                    chip.className = "mini-chip";
+                    chip.textContent = `${t.icon} ${t.name}`;
+                    backTopics.appendChild(chip);
+                });
+                backTopicsRow.style.display = "block";
+            } else {
+                backTopicsRow.style.display = "none";
+            }
+
+            if (isVerb && w.hasPreposition && w.prepositions && w.prepositions.length > 0) {
+                backPreps.innerHTML = "";
+                w.prepositions.forEach((p) => {
+                    const item = document.createElement("div");
+                    item.className = "prep-detail-item";
+                    const head = document.createElement("div");
+                    head.className = "prep-detail-head";
+                    head.innerHTML = `<span>${escapeHtml(p.word || "")}</span>`;
+                    if (p.case) {
+                        const tag = document.createElement("span");
+                        tag.className = "prep-case-tag";
+                        tag.textContent = p.case;
+                        head.appendChild(tag);
+                    }
+                    item.appendChild(head);
+                    if (p.meaning) {
+                        const mn = document.createElement("div");
+                        mn.className = "prep-detail-meaning";
+                        mn.textContent = p.meaning;
+                        item.appendChild(mn);
+                    }
+                    if (p.example) {
+                        const ex = document.createElement("div");
+                        ex.className = "prep-detail-example";
+                        ex.textContent = p.example;
+                        item.appendChild(ex);
+                    }
+                    backPreps.appendChild(item);
+                });
+                backPrepRow.style.display = "block";
+            } else {
+                backPrepRow.style.display = "none";
+            }
+
+            // ----- Thanh tiến trình -----
+            progressCount.textContent = `${currentIndex + 1}/${deck.length}`;
+            progressFill.style.width = `${((currentIndex + 1) / deck.length) * 100}%`;
+        }
+
+        function escapeHtml(str) {
+            const div = document.createElement("div");
+            div.textContent = str;
+            return div.innerHTML;
+        }
+
+        // ====== LẬT THẺ ======
+        flashcard.addEventListener("click", (e) => {
+            if (e.target.closest(".speak-btn")) return; // không lật khi bấm loa
+            isFlipped = !isFlipped;
+            flashcard.classList.toggle("flipped", isFlipped);
+        });
+
+        // ====== PHÁT ÂM ======
+        function buildSpeechText(w) {
+            const types = Array.isArray(w.types) ? w.types : (w.type ? [w.type] : []);
+            const parts = [];
+            if (types.includes("Nomen") && w.gender) parts.push(w.gender);
+            if (types.includes("Verb") && w.isReflexive) parts.push("sich");
+            parts.push(w.word || "");
+            return parts.join(" ").trim();
+        }
+        function speakGerman(text) {
+            if (!text) return;
+            if (!("speechSynthesis" in window)) {
+                alert("Trình duyệt của bạn không hỗ trợ phát âm.");
+                return;
+            }
+            window.speechSynthesis.cancel();
+            const u = new SpeechSynthesisUtterance(text);
+            u.lang = "de-DE";
+            const deVoice = window.speechSynthesis.getVoices().find((v) => v.lang && v.lang.startsWith("de"));
+            if (deVoice) u.voice = deVoice;
+            window.speechSynthesis.speak(u);
+        }
+        speakFrontBtn.addEventListener("click", (e) => {
+            e.stopPropagation();
+            speakGerman(buildSpeechText(deck[currentIndex]));
+        });
+        speakBackBtn.addEventListener("click", (e) => {
+            e.stopPropagation();
+            speakGerman(buildSpeechText(deck[currentIndex]));
+        });
+
+        // ====== TRẢ LỜI: CHƯA THUỘC / ĐÃ THUỘC ======
+        async function answer(learned) {
+            if (answering) return;
+            answering = true;
+            unlearnedBtn.disabled = true;
+            learnedBtn.disabled = true;
+
+            const w = deck[currentIndex];
+            try {
+                await updateDoc(doc(db, VOCAB_COLLECTION, w.id), { learned });
+                w.learned = learned; // đồng bộ trong bộ nhớ, để nếu quay lại vocab.html sẽ load lại đúng từ Firestore
+                if (learned) learnedCountThisRound++;
+            } catch (err) {
+                alert("Không lưu được trạng thái: " + (err.code || err.message));
+                answering = false;
+                unlearnedBtn.disabled = false;
+                learnedBtn.disabled = false;
+                return;
+            }
+
+            goNext();
+            answering = false;
+            unlearnedBtn.disabled = false;
+            learnedBtn.disabled = false;
+        }
+        unlearnedBtn.addEventListener("click", () => answer(false));
+        learnedBtn.addEventListener("click", () => answer(true));
+
+        function goNext() {
+            if (currentIndex + 1 >= deck.length) {
+                doneSummary.textContent = `Bạn đã ôn ${deck.length} từ, trong đó đánh dấu "Đã thuộc" ${learnedCountThisRound} từ.`;
+                showOnly(doneState);
+                return;
+            }
+            currentIndex++;
+            renderCard();
+        }
+
+        // ====== LUYỆN BỘ MỚI ======
+        restartBtn.addEventListener("click", () => {
+            startNewRound();
+        });
+
+        // ====== CÀI ĐẶT ======
+        function renderSettings() {
+            toggleGerman.classList.toggle("on", settings.showGerman);
+            toggleVietnamese.classList.toggle("on", settings.showVietnamese);
+            toggleAutoSpeak.classList.toggle("on", settings.autoSpeak);
+
+            if (settings.showGerman && settings.showVietnamese) {
+                settingHint.textContent = "Mặt trước sẽ ngẫu nhiên hiện Tiếng Đức hoặc Tiếng Việt.";
+            } else if (settings.showGerman) {
+                settingHint.textContent = "Mặt trước sẽ luôn hiện Tiếng Đức.";
+            } else {
+                settingHint.textContent = "Mặt trước sẽ luôn hiện Tiếng Việt.";
+            }
+            settingHint.classList.add("show");
+        }
+
+        settingsBtn.addEventListener("click", () => {
+            renderSettings();
+            settingsOverlay.classList.add("open");
+        });
+        closeSettingsBtn.addEventListener("click", () => {
+            settingsOverlay.classList.remove("open");
+        });
+        settingsOverlay.addEventListener("click", (e) => {
+            if (e.target === settingsOverlay) settingsOverlay.classList.remove("open");
+        });
+
+        toggleGerman.addEventListener("click", () => {
+            // Không cho tắt hết cả 2: nếu đang tắt cái cuối cùng, không làm gì
+            if (settings.showGerman && !settings.showVietnamese) return;
+            settings.showGerman = !settings.showGerman;
+            saveSettings();
+            renderSettings();
+        });
+        toggleVietnamese.addEventListener("click", () => {
+            if (settings.showVietnamese && !settings.showGerman) return;
+            settings.showVietnamese = !settings.showVietnamese;
+            saveSettings();
+            renderSettings();
+        });
+        toggleAutoSpeak.addEventListener("click", () => {
+            settings.autoSpeak = !settings.autoSpeak;
+            saveSettings();
+            renderSettings();
+        });
+
+        if ("speechSynthesis" in window) {
+            window.speechSynthesis.onvoiceschanged = () => {};
+        }
+    </script>
+
+    <!-- Áp dụng theme sớm để tránh nhấp nháy màu -->
+    <script>
+        (function () {
+            const saved = localStorage.getItem("theme") || "light";
+            document.documentElement.setAttribute("data-theme", saved);
+        })();
+    </script>
+
+</body>
+</html>
