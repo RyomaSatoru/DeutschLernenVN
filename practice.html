@@ -1,8 +1,6 @@
 <!DOCTYPE html>
 <html lang="vi" data-theme="light">
 <head>
-    <link rel="icon" type="image/png" href="favicon.png">
-    <link rel="apple-touch-icon" href="favicon.png">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Luyện tập - Học Tiếng Đức</title>
@@ -468,7 +466,7 @@
                             <button class="speak-btn small" id="speakBackBtn" title="Nghe phát âm">🔊</button>
                             <div class="back-header" id="backWord"></div>
                             <div class="back-meaning" id="backMeaning"></div>
-                            <div class="back-example" id="backExample" style="display:none;"></div>
+                            <div id="backExample" style="display:none;"></div>
                             <div class="back-row" id="backTypes"></div>
                             <div id="backTopicsRow" style="display:none;">
                                 <div class="detail-label">Chủ đề</div>
@@ -751,8 +749,16 @@
             backWord.innerHTML = "";
             backWord.appendChild(deWordFrag.cloneNode(true));
             backMeaning.textContent = w.meaning || "";
-            if (w.example) {
-                backExample.textContent = w.example;
+            // Tương thích dữ liệu cũ: "example" có thể là 1 chuỗi đơn (trước khi nâng cấp danh sách)
+            const wordExamples = Array.isArray(w.examples) ? w.examples.filter(Boolean) : (w.example ? [w.example] : []);
+            backExample.innerHTML = "";
+            if (wordExamples.length > 0) {
+                wordExamples.forEach((ex) => {
+                    const exEl = document.createElement("div");
+                    exEl.className = "back-example";
+                    exEl.textContent = ex;
+                    backExample.appendChild(exEl);
+                });
                 backExample.style.display = "block";
             } else {
                 backExample.style.display = "none";
