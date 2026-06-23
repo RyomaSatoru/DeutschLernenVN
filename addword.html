@@ -1,8 +1,6 @@
 <!DOCTYPE html>
 <html lang="vi" data-theme="light">
 <head>
-    <link rel="icon" type="image/png" href="favicon.png">
-    <link rel="apple-touch-icon" href="favicon.png">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Thêm từ - Học Tiếng Đức</title>
@@ -265,6 +263,25 @@
         }
         .add-prep-btn:hover { background: var(--primary-soft); border-color: var(--primary); }
 
+        /* ====== DANH SÁCH VÍ DỤ (REPEATER) ====== */
+        .example-list { display: flex; flex-direction: column; gap: 10px; }
+        .example-item {
+            display: flex; align-items: center; gap: 8px;
+        }
+        .example-item input.example-text {
+            flex: 1; min-width: 0;
+        }
+        .example-remove-btn {
+            width: 38px; height: 38px;
+            flex-shrink: 0;
+            display: inline-flex; align-items: center; justify-content: center;
+            background: var(--danger-soft);
+            color: var(--danger);
+            border: none; border-radius: 10px;
+            cursor: pointer; font-size: 14px;
+        }
+        .example-remove-btn:hover { opacity: 0.85; }
+
         /* ====== NÚT LƯU ====== */
         .save-row { margin-top: 26px; }
         .btn {
@@ -317,7 +334,7 @@
                 <!-- Từ tiếng Đức -->
                 <div class="field">
                     <label for="wordInput">Từ tiếng Đức <span class="req">*</span></label>
-                    <input type="text" id="wordInput" placeholder="" autocomplete="off">
+                    <input type="text" id="wordInput" placeholder="Ví dụ: Haus" autocomplete="off">
                 </div>
 
                 <!-- Giống (chỉ hiện với Nomen) -->
@@ -358,13 +375,14 @@
                 <!-- Nghĩa tiếng Việt -->
                 <div class="field">
                     <label for="meaningInput">Nghĩa tiếng Việt <span class="req">*</span></label>
-                    <input type="text" id="meaningInput" placeholder="" autocomplete="off">
+                    <input type="text" id="meaningInput" placeholder="Ví dụ: ngôi nhà" autocomplete="off">
                 </div>
 
-                <!-- Ví dụ -->
+                <!-- Ví dụ (nhiều ví dụ, mỗi ví dụ một ô riêng) -->
                 <div class="field">
-                    <label for="exampleInput">Ví dụ <span class="opt">(không bắt buộc)</span></label>
-                    <textarea id="exampleInput" placeholder=""></textarea>
+                    <label>Ví dụ <span class="opt">(không bắt buộc)</span></label>
+                    <div class="example-list" id="exampleList"></div>
+                    <button type="button" class="add-prep-btn" id="addExampleBtn">➕ Thêm ví dụ</button>
                 </div>
 
                 <!-- Chủ đề -->
@@ -427,7 +445,8 @@
         const prepList = document.getElementById("prepList");
         const addPrepBtn = document.getElementById("addPrepBtn");
         const meaningInput = document.getElementById("meaningInput");
-        const exampleInput = document.getElementById("exampleInput");
+        const exampleList = document.getElementById("exampleList");
+        const addExampleBtn = document.getElementById("addExampleBtn");
         const topicGroup = document.getElementById("topicGroup");
         const manageTopicsBtn = document.getElementById("manageTopicsBtn");
         const saveBtn = document.getElementById("saveBtn");
@@ -441,6 +460,7 @@
         let isReflexive = false;          // chỉ áp dụng khi có "Verb"
         let hasPreposition = false;       // chỉ áp dụng khi có "Verb"
         let prepositions = [];            // [{word, case: "Akkusativ"|"Dativ"|null, meaning, example}]
+        let examples = [""];              // danh sách ví dụ, mỗi ví dụ một câu riêng
         let selectedTopics = new Set();   // id chủ đề đã chọn
         let topics = [];                  // [{id,name,icon}] gồm cả Khác
 
@@ -480,6 +500,7 @@
             renderReflexiveSwitch();
             renderPrepositionSwitch();
             renderPrepList();
+            renderExampleList();
             renderTopicChips();
         }
 
@@ -530,7 +551,14 @@
                 })) : [];
                 wordInput.value = w.word || "";
                 meaningInput.value = w.meaning || "";
-                exampleInput.value = w.example || "";
+                // Tương thích dữ liệu cũ: "example" có thể là 1 chuỗi đơn (trước khi nâng cấp danh sách)
+                if (Array.isArray(w.examples)) {
+                    examples = w.examples.length ? [...w.examples] : [""];
+                } else if (w.example) {
+                    examples = [w.example];
+                } else {
+                    examples = [""];
+                }
                 selectedTopics = new Set((w.topics && w.topics.length) ? w.topics : ["other"]);
             } catch (err) {
                 showMessage("Lỗi tải từ: " + (err.code || err.message), "error");
@@ -655,7 +683,7 @@
             const wordInputEl = document.createElement("input");
             wordInputEl.type = "text";
             wordInputEl.className = "prep-word";
-            wordInputEl.placeholder = "";
+            wordInputEl.placeholder = "Ví dụ: auf, an, für...";
             wordInputEl.value = p.word;
             wordInputEl.addEventListener("input", () => { p.word = wordInputEl.value; });
             wordWrap.appendChild(wordLabel);
@@ -695,7 +723,7 @@
             meaningLabel.textContent = "Nghĩa *";
             const meaningInputEl = document.createElement("input");
             meaningInputEl.type = "text";
-            meaningInputEl.placeholder = "";
+            meaningInputEl.placeholder = "Ví dụ: chờ đợi cái gì/ai";
             meaningInputEl.value = p.meaning;
             meaningInputEl.addEventListener("input", () => { p.meaning = meaningInputEl.value; });
             meaningWrap.appendChild(meaningLabel);
@@ -712,7 +740,7 @@
             exampleLabel.textContent = "Ví dụ (không bắt buộc)";
             const exampleInputEl = document.createElement("input");
             exampleInputEl.type = "text";
-            exampleInputEl.placeholder = "";
+            exampleInputEl.placeholder = "Ví dụ: Ich warte auf den Bus.";
             exampleInputEl.value = p.example;
             exampleInputEl.addEventListener("input", () => { p.example = exampleInputEl.value; });
             exampleWrap.appendChild(exampleLabel);
@@ -727,6 +755,47 @@
         addPrepBtn.addEventListener("click", () => {
             prepositions.push({ word: "", case: null, meaning: "", example: "" });
             renderPrepList();
+        });
+
+        // ====== DANH SÁCH VÍ DỤ (REPEATER) ======
+        function renderExampleList() {
+            exampleList.innerHTML = "";
+            if (examples.length === 0) examples.push("");
+            examples.forEach((ex, idx) => {
+                exampleList.appendChild(buildExampleItem(ex, idx));
+            });
+        }
+        function buildExampleItem(value, idx) {
+            const item = document.createElement("div");
+            item.className = "example-item";
+
+            const input = document.createElement("input");
+            input.type = "text";
+            input.className = "example-text";
+            input.placeholder = "Ví dụ: Das Haus ist groß.";
+            input.value = value;
+            input.addEventListener("input", () => { examples[idx] = input.value; });
+            item.appendChild(input);
+
+            // Nút xoá (chỉ hiện nếu có nhiều hơn 1 ví dụ)
+            if (examples.length > 1) {
+                const removeBtn = document.createElement("button");
+                removeBtn.type = "button";
+                removeBtn.className = "example-remove-btn";
+                removeBtn.textContent = "✕";
+                removeBtn.title = "Xoá ví dụ này";
+                removeBtn.addEventListener("click", () => {
+                    examples.splice(idx, 1);
+                    renderExampleList();
+                });
+                item.appendChild(removeBtn);
+            }
+
+            return item;
+        }
+        addExampleBtn.addEventListener("click", () => {
+            examples.push("");
+            renderExampleList();
         });
 
         // ====== RENDER CHIP CHỦ ĐỀ ======
@@ -762,7 +831,7 @@
                 prepositions: prepositions.map((p) => ({ ...p })),
                 word: wordInput.value,
                 meaning: meaningInput.value,
-                example: exampleInput.value,
+                examples: [...examples],
                 topics: [...selectedTopics]
             };
         }
@@ -790,7 +859,13 @@
             })) : [];
             wordInput.value = d.word || "";
             meaningInput.value = d.meaning || "";
-            exampleInput.value = d.example || "";
+            if (Array.isArray(d.examples)) {
+                examples = d.examples.length ? [...d.examples] : [""];
+            } else if (d.example) {
+                examples = [d.example];
+            } else {
+                examples = [""];
+            }
             selectedTopics = new Set(d.topics && d.topics.length ? d.topics : ["other"]);
             // Bỏ chọn chủ đề không còn tồn tại (trừ "other")
             const valid = new Set(topics.map((t) => t.id));
@@ -803,7 +878,8 @@
             hideMessage();
             const word = wordInput.value.trim();
             const meaning = meaningInput.value.trim();
-            const example = exampleInput.value.trim();
+            // Lọc bỏ các ô ví dụ để trống (ví dụ là không bắt buộc, có thể có 0, 1 hoặc nhiều câu)
+            const cleanExamples = examples.map((e) => (e || "").trim()).filter((e) => e.length > 0);
 
             // Kiểm tra hợp lệ
             if (selectedTypes.size === 0) return showMessage("Vui lòng chọn ít nhất một loại từ.", "error");
@@ -837,7 +913,7 @@
                 isReflexive: selectedTypes.has("Verb") ? isReflexive : false,
                 hasPreposition: selectedTypes.has("Verb") ? hasPreposition : false,
                 prepositions: (selectedTypes.has("Verb") && hasPreposition) ? cleanPrepositions : [],
-                example,
+                examples: cleanExamples,
                 topics: [...selectedTopics],
                 updatedAt: serverTimestamp()
             };
