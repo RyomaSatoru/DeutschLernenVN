@@ -1,8 +1,6 @@
 <!DOCTYPE html>
 <html lang="vi" data-theme="light">
 <head>
-    <link rel="icon" type="image/png" href="favicon.png">
-    <link rel="apple-touch-icon" href="favicon.png">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Từ vựng - Học Tiếng Đức</title>
@@ -293,6 +291,7 @@
             color: var(--text-muted); font-size: 14px; font-style: italic;
             margin-top: 6px; padding-left: 10px; border-left: 2px solid var(--border);
         }
+        .word-example + .word-example { margin-top: 5px; }
         .word-meta {
             display: flex; flex-wrap: wrap; gap: 6px; align-items: center;
             margin-top: 12px;
@@ -697,11 +696,15 @@
                 m.textContent = w.meaning;
                 card.appendChild(m);
             }
-            if (w.example) {
-                const ex = document.createElement("div");
-                ex.className = "word-example";
-                ex.textContent = w.example;
-                card.appendChild(ex);
+            // Tương thích dữ liệu cũ: "example" có thể là 1 chuỗi đơn (trước khi nâng cấp danh sách)
+            const examples = Array.isArray(w.examples) ? w.examples.filter(Boolean) : (w.example ? [w.example] : []);
+            if (examples.length > 0) {
+                examples.forEach((ex) => {
+                    const exEl = document.createElement("div");
+                    exEl.className = "word-example";
+                    exEl.textContent = ex;
+                    card.appendChild(exEl);
+                });
             }
             if (types.length > 0) {
                 const meta = document.createElement("div");
