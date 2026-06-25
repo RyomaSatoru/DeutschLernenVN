@@ -848,17 +848,54 @@
             parts.push(w.word || "");
             return parts.join(" ").trim();
         }
-        function speakGerman(text) {
+        // ====== CHỌN GIỌNG TIẾNG ĐỨC TỐT NHẤT CÓ SẴN ======
+        function pickBestGermanVoice() {
+            const voices = window.speechSynthesis.getVoices();
+            const germanVoices = voices.filter((v) => v.lang && v.lang.toLowerCase().startsWith("de"));
+            if (germanVoices.length === 0) return null;
+
+            const byNameIncludes = (kw) => germanVoices.find((v) => v.name.toLowerCase().includes(kw));
+
+            return byNameIncludes("google")
+                || byNameIncludes("enhanced")
+                || byNameIncludes("premium")
+                || germanVoices.find((v) => v.lang.toLowerCase() === "de-de")
+                || germanVoices[0];
+        }
+
+        // Chờ danh sách giọng tải xong (Safari/iOS thường tải trễ)
+        function ensureVoicesReady() {
+            return new Promise((resolve) => {
+                const existing = window.speechSynthesis.getVoices();
+                if (existing.length > 0) return resolve();
+                let resolved = false;
+                const finish = () => {
+                    if (resolved) return;
+                    resolved = true;
+                    resolve();
+                };
+                window.speechSynthesis.onvoiceschanged = finish;
+                setTimeout(finish, 1500);
+            });
+        }
+
+        async function speakGerman(text) {
             if (!text) return;
             if (!("speechSynthesis" in window)) {
                 alert("Trình duyệt của bạn không hỗ trợ phát âm.");
                 return;
             }
             window.speechSynthesis.cancel();
+            await ensureVoicesReady();
+
             const u = new SpeechSynthesisUtterance(text);
             u.lang = "de-DE";
-            const deVoice = window.speechSynthesis.getVoices().find((v) => v.lang && v.lang.startsWith("de"));
-            if (deVoice) u.voice = deVoice;
+            u.rate = 0.95;
+            const bestVoice = pickBestGermanVoice();
+            if (bestVoice) {
+                u.voice = bestVoice;
+                u.lang = bestVoice.lang;
+            }
             window.speechSynthesis.speak(u);
         }
         speakFrontBtn.addEventListener("click", (e) => {
@@ -958,10 +995,6 @@
             saveSettings();
             renderSettings();
         });
-
-        if ("speechSynthesis" in window) {
-            window.speechSynthesis.onvoiceschanged = () => {};
-        }
     </script>
 
     <!-- Áp dụng theme sớm để tránh nhấp nháy màu -->

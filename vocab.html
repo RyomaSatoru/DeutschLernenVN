@@ -226,7 +226,7 @@
         .word-card {
             background: var(--card-bg);
             border: 1px solid var(--border);
-            border-left: 4px solid var(--border);
+            border-left: 4px solid var(--danger);
             border-radius: 16px;
             padding: 16px 18px;
             box-shadow: var(--shadow-sm);
@@ -840,18 +840,59 @@
         }
 
         // ====== PHÁT ÂM TIẾNG ĐỨC (Web Speech API) ======
-        function speakGerman(text) {
+        // ====== CHỌN GIỌNG TIẾNG ĐỨC TỐT NHẤT CÓ SẴN ======
+        // Mỗi máy/trình duyệt có thể có nhiều giọng de-DE khác nhau (Google, Microsoft,
+        // Apple Enhanced...). Ưu tiên giọng tự nhiên nhất theo thứ tự: Google online ->
+        // Enhanced/Premium (macOS, iOS) -> de-DE chuẩn -> bất kỳ giọng "de" nào khác.
+        function pickBestGermanVoice() {
+            const voices = window.speechSynthesis.getVoices();
+            const germanVoices = voices.filter((v) => v.lang && v.lang.toLowerCase().startsWith("de"));
+            if (germanVoices.length === 0) return null;
+
+            const byNameIncludes = (kw) => germanVoices.find((v) => v.name.toLowerCase().includes(kw));
+
+            return byNameIncludes("google")
+                || byNameIncludes("enhanced")
+                || byNameIncludes("premium")
+                || germanVoices.find((v) => v.lang.toLowerCase() === "de-de")
+                || germanVoices[0];
+        }
+
+        // Trên một số trình duyệt (đặc biệt Safari/iOS), danh sách giọng tải TRỄ sau
+        // khi trang mở, nên lần gọi getVoices() đầu tiên có thể trả về rỗng. Hàm này
+        // chờ tới khi danh sách có dữ liệu (hoặc tối đa ~1.5s) rồi mới phát âm.
+        function ensureVoicesReady() {
+            return new Promise((resolve) => {
+                const existing = window.speechSynthesis.getVoices();
+                if (existing.length > 0) return resolve();
+                let resolved = false;
+                const finish = () => {
+                    if (resolved) return;
+                    resolved = true;
+                    resolve();
+                };
+                window.speechSynthesis.onvoiceschanged = finish;
+                setTimeout(finish, 1500); // phòng trường hợp sự kiện không bắn
+            });
+        }
+
+        async function speakGerman(text) {
             if (!text) return;
             if (!("speechSynthesis" in window)) {
                 alert("Trình duyệt của bạn không hỗ trợ phát âm.");
                 return;
             }
             window.speechSynthesis.cancel();
+            await ensureVoicesReady();
+
             const u = new SpeechSynthesisUtterance(text);
             u.lang = "de-DE";
-            // Ưu tiên giọng tiếng Đức nếu có
-            const deVoice = window.speechSynthesis.getVoices().find((v) => v.lang && v.lang.startsWith("de"));
-            if (deVoice) u.voice = deVoice;
+            u.rate = 0.95; // hơi chậm hơn bình thường một chút để nghe rõ từng âm
+            const bestVoice = pickBestGermanVoice();
+            if (bestVoice) {
+                u.voice = bestVoice;
+                u.lang = bestVoice.lang;
+            }
             window.speechSynthesis.speak(u);
         }
 
@@ -938,11 +979,6 @@
             pendingDeleteId = null;
             deleteOverlay.classList.remove("open");
         });
-
-        // Một số trình duyệt nạp danh sách giọng đọc trễ
-        if ("speechSynthesis" in window) {
-            window.speechSynthesis.onvoiceschanged = () => {};
-        }
 
         // ====== TỰ TẢI LẠI KHI QUAY VỀ TRANG NÀY ======
         // Khi người dùng sang trang khác (ví dụ Luyện tập) làm thay đổi trạng thái
