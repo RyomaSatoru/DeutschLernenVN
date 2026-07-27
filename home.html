@@ -1,8 +1,6 @@
 <!DOCTYPE html>
 <html lang="vi" data-theme="light">
 <head>
-    <link rel="icon" type="image/png" href="favicon.png">
-    <link rel="apple-touch-icon" href="favicon.png">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Trang chủ - Học Tiếng Đức</title>
@@ -347,6 +345,14 @@
                     </span>
                     <span class="arrow">→</span>
                 </button>
+                <button class="action-card" id="grammarBtn">
+                    <span class="emoji">📖</span>
+                    <span class="label">
+                        <strong>Ngữ pháp</strong>
+                        <span>Tra cứu và ôn luyện ngữ pháp tiếng Đức</span>
+                    </span>
+                    <span class="arrow">→</span>
+                </button>
                 <button class="action-card" id="practiceBtn">
                     <span class="emoji">🎯</span>
                     <span class="label">
@@ -393,9 +399,10 @@
         const db = getFirestore(app);
 
         const LOGIN_PAGE = "login.html";
-        const VOCAB_PAGE = "vocab.html";       // trang học từ vựng (sẽ làm sau)
-        const PRACTICE_PAGE = "practice.html"; // trang luyện tập (sẽ làm sau)
-        const SETTINGS_PAGE = "settings.html"; // trang cài đặt (sẽ làm sau)
+        const VOCAB_PAGE = "vocab.html";
+        const GRAMMAR_PAGE = "grammar.html";
+        const PRACTICE_PAGE = "practice.html";
+        const SETTINGS_PAGE = "settings.html";
 
         // Tên collection lưu từ vựng. Khi làm trang học từ vựng, hãy lưu mỗi từ
         // là 1 document trong collection này, kèm field uid = uid người dùng.
@@ -412,6 +419,7 @@
         const logoutBtn = document.getElementById("logoutBtn");
         const settingsBtn = document.getElementById("settingsBtn");
         const vocabBtn = document.getElementById("vocabBtn");
+        const grammarBtn = document.getElementById("grammarBtn");
         const practiceBtn = document.getElementById("practiceBtn");
 
         // ====== AUTH GUARD ======
@@ -484,16 +492,10 @@
             }
         }
 
-        // ====== ĐIỀU HƯỚNG ======
-        vocabBtn.addEventListener("click", () => {
-            window.location.href = VOCAB_PAGE;
-        });
-        practiceBtn.addEventListener("click", () => {
-            window.location.href = PRACTICE_PAGE;
-        });
-        settingsBtn.addEventListener("click", () => {
-            window.location.href = SETTINGS_PAGE;
-        });
+        vocabBtn.addEventListener("click", () => { window.location.href = VOCAB_PAGE; });
+        grammarBtn.addEventListener("click", () => { window.location.href = GRAMMAR_PAGE; });
+        practiceBtn.addEventListener("click", () => { window.location.href = PRACTICE_PAGE; });
+        settingsBtn.addEventListener("click", () => { window.location.href = SETTINGS_PAGE; });
 
         // ====== ĐĂNG XUẤT ======
         logoutBtn.addEventListener("click", async () => {

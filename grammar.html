@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="vi" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ngữ pháp - Học Tiếng Đức</title>
+    <style>
+        :root,
+        html[data-theme="light"] {
+            --bg: #f5f7fb;
+            --card-bg: #ffffff;
+            --text: #16213e;
+            --text-muted: #6b7280;
+            --border: #e8ebf2;
+            --input-bg: #ffffff;
+            --primary: #0f3460;
+            --primary-hover: #16213e;
+            --primary-soft: #e8edf7;
+            --shadow-sm: 0 1px 3px rgba(15, 52, 96, 0.06);
+            --shadow: 0 8px 24px rgba(15, 52, 96, 0.12);
+            --header-bg: rgba(255, 255, 255, 0.85);
+            --chip-bg: #eef1f8;
+            --a1: #16a34a; --a1-soft: #dcfce7;
+            --a2: #2563eb; --a2-soft: #dbeafe;
+            --b1: #d97706; --b1-soft: #fef3c7;
+            --b2: #9333ea; --b2-soft: #f3e8ff;
+        }
+        html[data-theme="dark"] {
+            --bg: #0f1424;
+            --card-bg: #1c2336;
+            --text: #e9ecf5;
+            --text-muted: #9aa3bd;
+            --border: #2a3450;
+            --input-bg: #161c30;
+            --primary: #3b6fb5;
+            --primary-hover: #4d83cf;
+            --primary-soft: #232c44;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.3);
+            --shadow: 0 8px 24px rgba(0,0,0,0.5);
+            --header-bg: rgba(20, 26, 44, 0.85);
+            --chip-bg: #232c44;
+            --a1: #4ade80; --a1-soft: #14532d;
+            --a2: #60a5fa; --a2-soft: #1e3a6e;
+            --b1: #fbbf24; --b1-soft: #78350f;
+            --b2: #c084fc; --b2-soft: #581c87;
+        }
+
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            transition: background 0.3s, color 0.3s;
+        }
+
+        /* ====== HEADER ====== */
+        .site-header {
+            position: sticky; top: 0; z-index: 10;
+            background: var(--header-bg);
+            backdrop-filter: saturate(180%) blur(12px);
+            border-bottom: 1px solid var(--border);
+        }
+        .header-inner {
+            max-width: 720px; margin: 0 auto;
+            padding: 14px 20px;
+            display: flex; align-items: center; gap: 12px;
+        }
+        .back-btn {
+            width: 38px; height: 38px;
+            display: inline-flex; align-items: center; justify-content: center;
+            background: var(--card-bg); color: var(--text);
+            border: 1px solid var(--border); border-radius: 10px;
+            cursor: pointer; font-size: 18px; text-decoration: none;
+            transition: background 0.2s, border-color 0.2s, transform 0.1s;
+        }
+        .back-btn:hover { background: var(--primary-soft); border-color: var(--primary); }
+        .back-btn:active { transform: scale(0.94); }
+        .header-title { font-size: 17px; font-weight: 700; flex: 1; }
+
+        /* ====== NỘI DUNG ====== */
+        main { max-width: 720px; margin: 0 auto; padding: 22px 20px 60px; }
+
+        /* ====== THANH TÌM KIẾM ====== */
+        .search-wrap { position: relative; margin-bottom: 24px; }
+        .search-wrap .icon {
+            position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
+            font-size: 17px; pointer-events: none;
+        }
+        #searchInput {
+            width: 100%;
+            padding: 12px 14px 12px 42px;
+            border: 1.5px solid var(--border);
+            border-radius: 12px;
+            font-size: 15px;
+            background: var(--card-bg);
+            color: var(--text);
+            outline: none;
+            font-family: inherit;
+            transition: border-color 0.2s;
+        }
+        #searchInput:focus { border-color: var(--primary); }
+        #searchInput::placeholder { color: var(--text-muted); }
+
+        /* ====== KẾT QUẢ TÌM KIẾM ====== */
+        #searchResults { display: none; }
+        #searchResults.show { display: block; }
+        .search-result-item {
+            display: flex; align-items: center; gap: 12px;
+            padding: 13px 16px;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: background 0.15s, border-color 0.15s;
+        }
+        .search-result-item:hover { background: var(--primary-soft); border-color: var(--primary); }
+        .search-result-item .level-dot {
+            width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+        }
+        .search-result-item .title { font-size: 14.5px; font-weight: 600; }
+        .search-result-item .level-label { font-size: 12px; color: var(--text-muted); margin-left: auto; }
+
+        /* ====== DANH MỤC CẤP ĐỘ ====== */
+        #allLevels { }
+        .level-section { margin-bottom: 20px; }
+        .level-header {
+            display: flex; align-items: center; gap: 12px;
+            padding: 14px 18px;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            cursor: pointer;
+            user-select: none;
+            transition: background 0.15s;
+        }
+        .level-header:hover { background: var(--primary-soft); }
+        .level-badge {
+            font-size: 13px; font-weight: 800;
+            padding: 4px 12px; border-radius: 999px;
+            letter-spacing: 0.3px;
+        }
+        .badge-A1 { background: var(--a1-soft); color: var(--a1); }
+        .badge-A2 { background: var(--a2-soft); color: var(--a2); }
+        .badge-B1 { background: var(--b1-soft); color: var(--b1); }
+        .badge-B2 { background: var(--b2-soft); color: var(--b2); }
+        .level-title { font-size: 15px; font-weight: 700; flex: 1; }
+        .level-count { font-size: 13px; color: var(--text-muted); }
+        .level-chevron {
+            font-size: 14px; color: var(--text-muted);
+            transition: transform 0.25s;
+        }
+        .level-section.open .level-chevron { transform: rotate(180deg); }
+
+        /* ====== DANH SÁCH BÀI NGỮ PHÁP ====== */
+        .lesson-list {
+            overflow: hidden;
+            max-height: 0;
+            transition: max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .level-section.open .lesson-list { max-height: 2000px; }
+        .lesson-item {
+            margin-top: 8px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+            background: var(--card-bg);
+        }
+        .lesson-btn {
+            width: 100%; padding: 13px 18px;
+            display: flex; align-items: center; gap: 12px;
+            background: none; border: none; color: var(--text);
+            font-size: 14px; font-weight: 600; font-family: inherit;
+            cursor: pointer; text-align: left;
+            transition: background 0.15s;
+        }
+        .lesson-btn:hover { background: var(--primary-soft); }
+        .lesson-dot {
+            width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+        }
+        .dot-A1 { background: var(--a1); }
+        .dot-A2 { background: var(--a2); }
+        .dot-B1 { background: var(--b1); }
+        .dot-B2 { background: var(--b2); }
+        .lesson-chevron {
+            margin-left: auto; font-size: 13px; color: var(--text-muted);
+            transition: transform 0.25s; flex-shrink: 0;
+        }
+        .lesson-item.open .lesson-chevron { transform: rotate(180deg); }
+
+        /* ====== NỘI DUNG BÀI (ACCORDION) ====== */
+        .lesson-content {
+            overflow: hidden;
+            max-height: 0;
+            transition: max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            border-top: 0px solid var(--border);
+        }
+        .lesson-item.open .lesson-content {
+            max-height: 4000px;
+            border-top-width: 1px;
+        }
+        .lesson-content-inner {
+            padding: 20px 20px 22px;
+            font-size: 14.5px; line-height: 1.75;
+        }
+        /* ── Style cho nội dung bài ngữ pháp được inject vào ── */
+        .lesson-content-inner h2 {
+            font-size: 17px; font-weight: 800; margin: 0 0 14px;
+            color: var(--text);
+        }
+        .lesson-content-inner h3 {
+            font-size: 14.5px; font-weight: 700; margin: 18px 0 8px;
+            color: var(--text);
+        }
+        .lesson-content-inner p { margin: 0 0 10px; color: var(--text); }
+        .lesson-content-inner table {
+            width: 100%; border-collapse: collapse;
+            margin-bottom: 14px; font-size: 14px;
+        }
+        .lesson-content-inner th {
+            background: var(--primary-soft); color: var(--primary);
+            font-weight: 700; padding: 9px 12px; text-align: left;
+            border: 1px solid var(--border);
+        }
+        .lesson-content-inner td {
+            padding: 9px 12px; border: 1px solid var(--border); color: var(--text);
+        }
+        .lesson-content-inner tr:nth-child(even) td { background: var(--chip-bg); }
+        .lesson-content-inner .example {
+            background: var(--chip-bg); border-radius: 10px;
+            padding: 12px 14px; margin: 10px 0;
+            font-style: italic; color: var(--text);
+            border-left: 3px solid var(--primary);
+        }
+        .lesson-content-inner .note {
+            background: var(--b1-soft); color: var(--b1);
+            border-radius: 10px; padding: 10px 14px; margin: 10px 0;
+            font-size: 13.5px;
+        }
+        .lesson-content-inner .tip {
+            background: var(--a1-soft); color: var(--a1);
+            border-radius: 10px; padding: 10px 14px; margin: 10px 0;
+            font-size: 13.5px;
+        }
+        .loading-inline {
+            padding: 20px; text-align: center; color: var(--text-muted);
+            font-size: 14px;
+        }
+        .error-inline {
+            padding: 16px; color: #c0392b;
+            font-size: 14px; font-style: italic;
+        }
+    </style>
+</head>
+<body>
+
+    <header class="site-header">
+        <div class="header-inner">
+            <a class="back-btn" href="home.html" title="Quay lại">←</a>
+            <span class="header-title">📖 Ngữ pháp</span>
+        </div>
+    </header>
+
+    <main>
+        <!-- Thanh tìm kiếm -->
+        <div class="search-wrap">
+            <span class="icon">🔍</span>
+            <input type="text" id="searchInput" placeholder="Tìm bài ngữ pháp... (vd: Akkusativ, chia động từ)">
+        </div>
+
+        <!-- Kết quả tìm kiếm -->
+        <div id="searchResults"></div>
+
+        <!-- Danh mục theo cấp độ -->
+        <div id="allLevels"></div>
+    </main>
+
+    <script>
+        // Áp dụng theme sớm
+        (function () {
+            const saved = localStorage.getItem("theme") || "light";
+            document.documentElement.setAttribute("data-theme", saved);
+        })();
+
+        // ======================================================
+        // DANH MỤC NGỮ PHÁP TIẾNG ĐỨC
+        // Để thêm bài mới:
+        //   1. Tạo file grammar/ten-bai.html (chỉ viết nội dung, không cần <html><head><body>)
+        //   2. Thêm 1 dòng vào mảng cấp độ tương ứng bên dưới
+        //
+        // Mỗi object gồm:
+        //   id    — tên file (không có đuôi .html, không có "grammar/")
+        //   title — tên hiển thị trong danh sách
+        //   tags  — từ khoá tìm kiếm phụ (có thể để rỗng [])
+        // ======================================================
+        const GRAMMAR_INDEX = {
+            A1: [
+                { id: "nominativ",           title: "Nominativ — Cách 1 (chủ ngữ)",                  tags: ["mạo từ", "der die das", "chủ ngữ"] },
+                { id: "akkusativ",           title: "Akkusativ — Cách 4 (tân ngữ trực tiếp)",        tags: ["mạo từ", "tân ngữ", "den"] },
+                { id: "dativ",               title: "Dativ — Cách 3 (tân ngữ gián tiếp)",            tags: ["mạo từ", "dem", "tân ngữ"] },
+                { id: "praesens",            title: "Präsens — Thì hiện tại",                        tags: ["chia động từ", "hiện tại"] },
+                { id: "sein-haben",          title: "Sein & Haben — Chia động từ",                   tags: ["là", "có", "trợ động từ"] },
+                { id: "personalpronomen",    title: "Personalpronomen — Đại từ nhân xưng",           tags: ["ich du er sie", "đại từ"] },
+                { id: "bestimmte-artikel",   title: "Bestimmter Artikel — Mạo từ xác định",          tags: ["der die das", "mạo từ"] },
+                { id: "unbestimmte-artikel", title: "Unbestimmter Artikel — Mạo từ không xác định",  tags: ["ein eine", "mạo từ"] },
+                { id: "verneinung",          title: "Verneinung — Phủ định (nicht / kein)",          tags: ["không", "phủ định", "nicht kein"] },
+                { id: "wortstellung",        title: "Wortstellung — Trật tự từ trong câu",           tags: ["cấu trúc câu", "verb second"] },
+            ],
+            A2: [
+                { id: "praeteritum",         title: "Präteritum — Thì quá khứ đơn",                  tags: ["quá khứ", "chia động từ"] },
+                { id: "perfekt",             title: "Perfekt — Thì hoàn thành hiện tại",             tags: ["haben sein", "quá khứ", "partizip"] },
+                { id: "modal-verben",        title: "Modalverben — Động từ khiếm khuyết",            tags: ["können müssen dürfen", "modal"] },
+                { id: "komparativ",          title: "Komparativ & Superlativ — So sánh",             tags: ["so sánh hơn", "nhất"] },
+                { id: "trennbare-verben",    title: "Trennbare Verben — Động từ tách",               tags: ["aufmachen", "tách", "tiền tố"] },
+                { id: "praepositionen-a2",   title: "Präpositionen — Giới từ (Dativ & Akkusativ)",   tags: ["giới từ", "in an auf", "mit nach"] },
+                { id: "genitiv",             title: "Genitiv — Cách 2 (sở hữu)",                    tags: ["cách 2", "sở hữu", "des der"] },
+                { id: "reflexive-verben",    title: "Reflexive Verben — Động từ phản thân",          tags: ["sich", "phản thân"] },
+            ],
+            B1: [
+                { id: "konjunktiv-ii",       title: "Konjunktiv II — Thức giả định",                 tags: ["würde", "hätte wäre", "điều kiện"] },
+                { id: "passiv",              title: "Passiv — Câu bị động",                          tags: ["werden", "bị động"] },
+                { id: "nebensaetze",         title: "Nebensätze — Mệnh đề phụ (dass, weil…)",        tags: ["mệnh đề", "dass weil wenn ob"] },
+                { id: "infinitiv-zu",        title: "Infinitiv mit zu — Động từ nguyên mẫu có zu",  tags: ["zu", "nguyên mẫu"] },
+                { id: "relativsaetze",       title: "Relativsätze — Mệnh đề quan hệ",               tags: ["der die das welcher", "quan hệ"] },
+                { id: "plusquamperfekt",     title: "Plusquamperfekt — Thì quá khứ hoàn thành",      tags: ["quá khứ hoàn thành", "hatte war"] },
+                { id: "futur-i",             title: "Futur I — Thì tương lai",                       tags: ["werden", "tương lai"] },
+            ],
+            B2: [
+                { id: "konjunktiv-i",        title: "Konjunktiv I — Lời dẫn gián tiếp",              tags: ["gián tiếp", "sei habe werde"] },
+                { id: "passiv-varianten",    title: "Passivvarianten — Biến thể bị động",            tags: ["sein-passiv", "zustandspassiv"] },
+                { id: "partizipialkonst",    title: "Partizipialkonstruktionen — Mệnh đề rút gọn",   tags: ["partizip", "rút gọn"] },
+                { id: "konzessivsaetze",     title: "Konzessivsätze — Mệnh đề nhượng bộ",           tags: ["obwohl trotzdem", "nhượng bộ"] },
+                { id: "finalsaetze",         title: "Finalsätze — Mệnh đề mục đích",                 tags: ["damit um zu", "mục đích"] },
+                { id: "kausalsaetze",        title: "Kausalsätze — Mệnh đề nguyên nhân",            tags: ["weil da denn", "nguyên nhân"] },
+            ],
+        };
+
+        const LEVELS = ["A1", "A2", "B1", "B2"];
+        const LEVEL_LABELS = {
+            A1: "Sơ cấp — A1",
+            A2: "Sơ — Trung cấp — A2",
+            B1: "Trung cấp — B1",
+            B2: "Trung — Cao cấp — B2",
+        };
+
+        const allLevelsEl = document.getElementById("allLevels");
+        const searchInput = document.getElementById("searchInput");
+        const searchResults = document.getElementById("searchResults");
+
+        // Cache nội dung đã fetch để không cần tải lại mỗi lần mở đóng
+        const contentCache = new Map();
+
+        // ====== BUILD GIAO DIỆN ======
+        LEVELS.forEach((level) => {
+            const lessons = GRAMMAR_INDEX[level] || [];
+            const section = document.createElement("div");
+            section.className = "level-section";
+            section.dataset.level = level;
+
+            // Header cấp độ
+            const header = document.createElement("div");
+            header.className = "level-header";
+            header.innerHTML = `
+                <span class="level-badge badge-${level}">${level}</span>
+                <span class="level-title">${LEVEL_LABELS[level]}</span>
+                <span class="level-count">${lessons.length} bài</span>
+                <span class="level-chevron">▾</span>
+            `;
+            header.addEventListener("click", () => {
+                section.classList.toggle("open");
+            });
+            section.appendChild(header);
+
+            // Danh sách bài
+            const list = document.createElement("div");
+            list.className = "lesson-list";
+            lessons.forEach((lesson) => {
+                list.appendChild(buildLessonItem(lesson, level));
+            });
+            section.appendChild(list);
+            allLevelsEl.appendChild(section);
+        });
+
+        function buildLessonItem(lesson, level) {
+            const item = document.createElement("div");
+            item.className = "lesson-item";
+            item.dataset.id = lesson.id;
+
+            const btn = document.createElement("button");
+            btn.className = "lesson-btn";
+            btn.innerHTML = `
+                <span class="lesson-dot dot-${level}"></span>
+                <span>${lesson.title}</span>
+                <span class="lesson-chevron">▾</span>
+            `;
+
+            const contentWrap = document.createElement("div");
+            contentWrap.className = "lesson-content";
+            const inner = document.createElement("div");
+            inner.className = "lesson-content-inner";
+            contentWrap.appendChild(inner);
+
+            btn.addEventListener("click", () => {
+                const wasOpen = item.classList.contains("open");
+                item.classList.toggle("open");
+                if (!wasOpen) loadContent(lesson.id, inner);
+            });
+
+            item.appendChild(btn);
+            item.appendChild(contentWrap);
+            return item;
+        }
+
+        // ====== TẢI NỘI DUNG BÀI TỪ FILE HTML ======
+        async function loadContent(id, container) {
+            if (container.dataset.loaded) return; // đã tải rồi
+
+            if (contentCache.has(id)) {
+                container.innerHTML = contentCache.get(id);
+                container.dataset.loaded = "1";
+                return;
+            }
+
+            container.innerHTML = `<div class="loading-inline">Đang tải bài ngữ pháp...</div>`;
+            try {
+                const res = await fetch(`grammar/${id}.html`);
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                const html = await res.text();
+                contentCache.set(id, html);
+                container.innerHTML = html;
+                container.dataset.loaded = "1";
+            } catch (err) {
+                container.innerHTML = `<div class="error-inline">
+                    ⚠️ Chưa có nội dung cho bài này.<br>
+                    Hãy tạo file <code>grammar/${id}.html</code> để thêm nội dung.
+                </div>`;
+            }
+        }
+
+        // ====== TÌM KIẾM ======
+        searchInput.addEventListener("input", () => {
+            const q = searchInput.value.trim().toLowerCase();
+            if (!q) {
+                searchResults.innerHTML = "";
+                searchResults.classList.remove("show");
+                allLevelsEl.style.display = "block";
+                return;
+            }
+            allLevelsEl.style.display = "none";
+            searchResults.innerHTML = "";
+            searchResults.classList.add("show");
+
+            const hits = [];
+            LEVELS.forEach((level) => {
+                (GRAMMAR_INDEX[level] || []).forEach((lesson) => {
+                    const haystack = [lesson.title, ...(lesson.tags || [])].join(" ").toLowerCase();
+                    if (haystack.includes(q)) hits.push({ lesson, level });
+                });
+            });
+
+            if (hits.length === 0) {
+                searchResults.innerHTML = `<div style="text-align:center;color:var(--text-muted);padding:30px 0;font-size:14px;">Không tìm thấy bài nào phù hợp.</div>`;
+                return;
+            }
+
+            hits.forEach(({ lesson, level }) => {
+                const item = document.createElement("div");
+                item.className = "search-result-item";
+                item.innerHTML = `
+                    <span class="level-dot dot-${level}" style="background:var(--${level.toLowerCase()})"></span>
+                    <span class="title">${lesson.title}</span>
+                    <span class="level-label">${level}</span>
+                `;
+                item.addEventListener("click", () => {
+                    // Xoá tìm kiếm, mở đúng cấp + bài
+                    searchInput.value = "";
+                    searchResults.innerHTML = "";
+                    searchResults.classList.remove("show");
+                    allLevelsEl.style.display = "block";
+                    openLesson(level, lesson.id);
+                });
+                searchResults.appendChild(item);
+            });
+        });
+
+        // Mở đúng cấp và đúng bài khi bấm từ kết quả tìm kiếm
+        function openLesson(level, id) {
+            const section = allLevelsEl.querySelector(`.level-section[data-level="${level}"]`);
+            if (!section) return;
+            if (!section.classList.contains("open")) section.classList.add("open");
+            // Cuộn nhẹ về section
+            section.scrollIntoView({ behavior: "smooth", block: "start" });
+            // Sau khi accordion mở (delay nhỏ để animation chạy xong) thì mở bài
+            setTimeout(() => {
+                const item = section.querySelector(`.lesson-item[data-id="${id}"]`);
+                if (!item) return;
+                if (!item.classList.contains("open")) {
+                    item.classList.add("open");
+                    const inner = item.querySelector(".lesson-content-inner");
+                    loadContent(id, inner);
+                }
+                item.scrollIntoView({ behavior: "smooth", block: "start" });
+            }, 200);
+        }
+    </script>
+
+</body>
+</html>
