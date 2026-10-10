@@ -314,7 +314,7 @@
             lessons.forEach((lesson) => {
                 const a = document.createElement("a");
                 a.className = "lesson-link";
-                a.href = `grammar/${lesson.id}.html`;
+                a.href = `grammar-viewer.html?id=${lesson.id}`;
                 a.innerHTML = `
                     <span class="lesson-dot dot-${level}"></span>
                     <span>${lesson.title}</span>
@@ -354,7 +354,7 @@
             hits.forEach(({ lesson, level }) => {
                 const a = document.createElement("a");
                 a.className = "search-result-item";
-                a.href = `grammar/${lesson.id}.html`;
+                a.href = `grammar-viewer.html?id=${lesson.id}`;
                 a.innerHTML = `
                     <span class="lesson-dot dot-${level}"></span>
                     <span class="sr-title">${lesson.title}</span>

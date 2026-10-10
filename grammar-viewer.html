@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="vi" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tài liệu Ngữ pháp - Học Tiếng Đức</title>
+    <link rel="icon" type="image/png" href="./favicon.png">
+    <style>
+        /* ====== HỆ THỐNG THEME (Dark / Light) ====== */
+        :root, html[data-theme="light"] {
+            --bg: #f5f7fb;
+            --card-bg: #ffffff;
+            --text: #16213e;
+            --text-muted: #6b7280;
+            --border: #e8ebf2;
+            --primary: #0f3460;
+            --primary-hover: #16213e;
+            --primary-soft: #e8edf7;
+            --header-bg: rgba(255, 255, 255, 0.85);
+            --danger-soft: #fdecea;
+            --danger: #c0392b;
+        }
+        html[data-theme="dark"] {
+            --bg: #0f1424;
+            --card-bg: #1c2336;
+            --text: #e9ecf5;
+            --text-muted: #9aa3bd;
+            --border: #2a3450;
+            --primary: #3b6fb5;
+            --primary-hover: #4d83cf;
+            --primary-soft: #232c44;
+            --header-bg: rgba(20, 26, 44, 0.85);
+            --danger-soft: #3a2225;
+            --danger: #e57373;
+        }
+
+        * { box-sizing: border-box; }
+        body {
+            margin: 0; min-height: 100vh;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+            background: var(--bg); color: var(--text);
+            display: flex; flex-direction: column;
+            transition: background 0.3s, color 0.3s;
+        }
+
+        /* ====== HEADER ====== */
+        .site-header {
+            position: sticky; top: 0; z-index: 10;
+            background: var(--header-bg);
+            backdrop-filter: saturate(180%) blur(12px);
+            border-bottom: 1px solid var(--border);
+        }
+        .header-inner {
+            max-width: 960px; margin: 0 auto; padding: 12px 20px;
+            display: flex; align-items: center; gap: 12px;
+        }
+        .back-btn {
+            width: 38px; height: 38px;
+            display: inline-flex; align-items: center; justify-content: center;
+            background: var(--card-bg); color: var(--text);
+            border: 1px solid var(--border); border-radius: 10px;
+            cursor: pointer; font-size: 18px; text-decoration: none;
+            transition: background 0.2s, border-color 0.2s, transform 0.1s;
+        }
+        .back-btn:hover { background: var(--primary-soft); border-color: var(--primary); }
+        .back-btn:active { transform: scale(0.94); }
+        .header-title-box { flex: 1; min-width: 0; }
+        .header-title {
+            font-size: 16px; font-weight: 700;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+        .header-sub { font-size: 12px; color: var(--text-muted); }
+
+        /* ====== KHUNG XEM TÀI LIỆU ====== */
+        main {
+            max-width: 960px; width: 100%; margin: 0 auto;
+            padding: 16px 20px 30px; flex: 1;
+            display: flex; flex-direction: column;
+        }
+        .viewer-container {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            overflow: hidden;
+            flex: 1; min-height: 75vh;
+            display: flex; flex-direction: column;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+        }
+        .pdf-frame {
+            width: 100%; height: 100%; min-height: 75vh;
+            border: none; flex: 1; background: #525659;
+        }
+
+        /* Trạng thái nếu chưa có file */
+        .empty-notice {
+            display: none; flex-direction: column; align-items: center; justify-content: center;
+            text-align: center; padding: 60px 20px; flex: 1;
+        }
+        .empty-notice.show { display: flex; }
+        .empty-notice .emoji { font-size: 48px; margin-bottom: 12px; }
+        .empty-notice h3 { margin: 0 0 8px; font-size: 18px; }
+        .empty-notice p { margin: 0 0 20px; color: var(--text-muted); font-size: 14px; }
+    </style>
+</head>
+<body>
+
+    <header class="site-header">
+        <div class="header-inner">
+            <a class="back-btn" href="grammar.html" title="Quay lại">←</a>
+            <div class="header-title-box">
+                <div class="header-title" id="pageTitle">Tài liệu Ngữ pháp</div>
+                <div class="header-sub">Tóm tắt & Bài giảng chi tiết</div>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <div class="viewer-container">
+            <iframe class="pdf-frame" id="pdfViewer" src=""></iframe>
+            <div class="empty-notice" id="emptyNotice">
+                <div class="emoji">📝</div>
+                <h3>Bài học đang được chuẩn bị</h3>
+                <p>Tài liệu PDF cho bài học này sẽ sớm được tải lên.</p>
+                <a class="back-btn" href="grammar.html" style="width: auto; padding: 8px 16px; font-size: 14px;">Quay lại danh mục</a>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Đồng bộ Theme sáng/tối
+        (function () {
+            const saved = localStorage.getItem("theme") || "light";
+            document.documentElement.setAttribute("data-theme", saved);
+        })();
+
+        // Danh mục tiêu đề bài học để hiển thị lên Header
+        const GRAMMAR_TITLES = {
+            "satzarten": "Satzarten — Các loại câu cơ bản",
+            "praesens": "Konjugation Präsens — Chia động từ hiện tại",
+            "faelle-artikel": "Fälle, Artikel & Pronomen — Cách, mạo từ, đại từ",
+            "praepositionen-a1": "Präpositionen — Giới từ cố định (Akk & Dat)",
+            "modalverben": "Modalverben — Động từ khiếm khuyết",
+            "perfekt": "Perfekt — Thì hiện tại hoàn thành",
+            "negation": "Negation — Phủ định (nicht / kein)",
+            "plural": "Plural — Số nhiều của danh từ",
+            "vergleich": "Vergleich (so…wie) — So sánh bằng",
+            "praeteritum": "Präteritum — Quá khứ đơn",
+            "perfekt-vertiefung": "Perfekt Vertiefung — Mở rộng Perfekt",
+            "plusquamperfekt": "Plusquamperfekt — Quá khứ hoàn thành",
+            "futur-i": "Futur I — Tương lai đơn",
+            "wechselpraepositionen": "Wechselpräpositionen — Giới từ linh hoạt",
+            "reflexivverben": "Reflexivverben — Động từ phản thân",
+            "genitiv": "Genitiv — Sở hữu cách",
+            "komparativ": "Komparativ & Superlativ — So sánh hơn và nhất",
+            "verben-praepositionen": "Verben mit Präpositionen — Động từ đi kèm giới từ",
+            "temporalsaetze": "Temporalsätze — Mệnh đề thời gian (cơ bản)",
+            "nebensaetze": "Nebensätze (dass, weil, ob) — Mệnh đề phụ cơ bản",
+            "indefinitpronomen": "Indefinitpronomen — Đại từ bất định",
+            "adjektivdeklination": "Adjektivdeklination — Chia tính từ",
+            "n-deklination": "N-Deklination — Biến cách đặc biệt giống đực",
+            "vorgangspassiv": "Vorgangspassiv — Bị động hành động",
+            "konjunktiv-ii": "Konjunktiv II — Giả định cơ bản",
+            "konjunktionaladverbien": "Konjunktionaladverbien — Trạng từ nối",
+            "relativsatz": "Relativsatz — Mệnh đề quan hệ",
+            "infinitiv-zu": "Infinitiv mit zu & Finalsätze — Mục đích",
+            "pronominaladverbien": "Pronominaladverbien — Đại từ chỉ nơi chốn/vật",
+            "indirekte-fragen": "Indirekte Fragen — Câu hỏi gián tiếp",
+            "temporalsaetze-b1": "Temporalsätze Erweiterung — Mệnh đề thời gian (mở rộng)",
+            "kausalsaetze": "Kausalsätze — Mệnh đề lý do",
+            "konzessivsaetze": "Konzessivsätze (obwohl, trotzdem) — Nhượng bộ",
+            "tekamolo": "TE-KA-MO-LO — Trật tự bổ ngữ nâng cao",
+            "passiv-vertiefung": "Passiv Vertiefung — Bị động mở rộng",
+            "subjektive-modalverben": "Subjektive Modalverben — Động từ khiếm khuyết chủ quan",
+            "konjunktiv-i": "Konjunktiv I — Gián tiếp lời nói (báo chí)",
+            "konjunktiv-ii-b2": "Konjunktiv II Vertiefung — Giả định mở rộng",
+            "nominalisierung": "Nominalisierung — Chuyển động từ → danh từ",
+            "partizip": "Partizip I/II & Partizipialattribute — Phân từ làm định ngữ",
+            "funktionsverbgefuege": "Funktionsverbgefüge — Cụm động từ chức năng",
+            "modalpartikeln": "Modalpartikeln — Tiểu từ tình thái",
+            "konjunktionen": "Fortführende Konjunktionen — Liên từ đôi",
+            "futur-ii": "Futur II — Tương lai hoàn thành",
+            "adjektiv-als-nomen": "Adjektiv als Nomen — Tính từ hóa danh từ",
+            "konzessivsaetze-b2": "Konzessivsätze erweitert — Nhượng bộ nâng cao",
+            "konsekutivsaetze": "Konsekutivsätze — Mệnh đề chỉ kết quả"
+        };
+
+        const params = new URLSearchParams(window.location.search);
+        const lessonId = params.get("id");
+
+        const pageTitle = document.getElementById("pageTitle");
+        const pdfViewer = document.getElementById("pdfViewer");
+        const emptyNotice = document.getElementById("emptyNotice");
+
+        if (lessonId && GRAMMAR_TITLES[lessonId]) {
+            pageTitle.textContent = GRAMMAR_TITLES[lessonId];
+            const pdfPath = `./grammar-docs/${lessonId}.pdf`;
+
+            fetch(pdfPath, { method: "HEAD" })
+                .then((res) => {
+                    if (res.ok) {
+                        pdfViewer.src = pdfPath;
+                    } else {
+                        pdfViewer.style.display = "none";
+                        emptyNotice.classList.add("show");
+                    }
+                })
+                .catch(() => {
+                    pdfViewer.src = pdfPath;
+                });
+        } else {
+            pdfViewer.style.display = "none";
+            emptyNotice.classList.add("show");
+        }
+    </script>
+</body>
+</html>
