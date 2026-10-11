@@ -5,6 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tài liệu Ngữ pháp - Học Tiếng Đức</title>
     <link rel="icon" type="image/png" href="./favicon.png">
+
+    <!-- Thư viện Mozilla PDF.js qua CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+
     <style>
         /* ====== HỆ THỐNG THEME (Dark / Light) ====== */
         :root, html[data-theme="light"] {
@@ -17,8 +21,7 @@
             --primary-hover: #16213e;
             --primary-soft: #e8edf7;
             --header-bg: rgba(255, 255, 255, 0.85);
-            --danger-soft: #fdecea;
-            --danger: #c0392b;
+            --pdf-bg: #525659;
         }
         html[data-theme="dark"] {
             --bg: #0f1424;
@@ -30,8 +33,7 @@
             --primary-hover: #4d83cf;
             --primary-soft: #232c44;
             --header-bg: rgba(20, 26, 44, 0.85);
-            --danger-soft: #3a2225;
-            --danger: #e57373;
+            --pdf-bg: #1e222d;
         }
 
         * { box-sizing: border-box; }
@@ -71,30 +73,46 @@
         }
         .header-sub { font-size: 12px; color: var(--text-muted); }
 
-        /* ====== KHUNG XEM TÀI LIỆU ====== */
+        /* ====== KHU VỰC HIỂN THỊ CÁC TRANG PDF ====== */
         main {
             max-width: 960px; width: 100%; margin: 0 auto;
             padding: 16px 20px 30px; flex: 1;
             display: flex; flex-direction: column;
         }
         .viewer-container {
-            background: var(--card-bg);
+            background: var(--pdf-bg);
             border: 1px solid var(--border);
             border-radius: 16px;
-            overflow: hidden;
             flex: 1; min-height: 75vh;
             display: flex; flex-direction: column;
+            align-items: center;
+            padding: 16px 10px;
+            gap: 16px;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
         }
-        .pdf-frame {
-            width: 100%; height: 100%; min-height: 75vh;
-            border: none; flex: 1; background: #525659;
+
+        /* Từng trang PDF render bằng thẻ Canvas */
+        .pdf-page-canvas {
+            max-width: 100%;
+            height: auto !important;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+            border-radius: 4px;
+            background: #ffffff;
         }
 
-        /* Trạng thái nếu chưa có file */
+        /* Trạng thái tải / thông báo */
+        .loading-text {
+            color: #ffffff;
+            font-size: 14px;
+            margin: auto;
+            text-align: center;
+        }
         .empty-notice {
             display: none; flex-direction: column; align-items: center; justify-content: center;
             text-align: center; padding: 60px 20px; flex: 1;
+            background: var(--card-bg); width: 100%; border-radius: 12px;
         }
         .empty-notice.show { display: flex; }
         .empty-notice .emoji { font-size: 48px; margin-bottom: 12px; }
@@ -115,8 +133,8 @@
     </header>
 
     <main>
-        <div class="viewer-container">
-            <iframe class="pdf-frame" id="pdfViewer" src=""></iframe>
+        <div class="viewer-container" id="viewerContainer">
+            <div class="loading-text" id="loadingText">Đang tải tài liệu...</div>
             <div class="empty-notice" id="emptyNotice">
                 <div class="emoji">📝</div>
                 <h3>Bài học đang được chuẩn bị</h3>
@@ -127,13 +145,14 @@
     </main>
 
     <script>
-        // Đồng bộ Theme sáng/tối
         (function () {
             const saved = localStorage.getItem("theme") || "light";
             document.documentElement.setAttribute("data-theme", saved);
         })();
 
-        // Danh mục tiêu đề bài học để hiển thị lên Header
+        // Cấu hình worker cho PDF.js
+        pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+
         const GRAMMAR_TITLES = {
             "satzarten": "Satzarten — Các loại câu cơ bản",
             "praesens": "Konjugation Präsens — Chia động từ hiện tại",
@@ -188,27 +207,54 @@
         const lessonId = params.get("id");
 
         const pageTitle = document.getElementById("pageTitle");
-        const pdfViewer = document.getElementById("pdfViewer");
+        const viewerContainer = document.getElementById("viewerContainer");
+        const loadingText = document.getElementById("loadingText");
         const emptyNotice = document.getElementById("emptyNotice");
 
         if (lessonId && GRAMMAR_TITLES[lessonId]) {
             pageTitle.textContent = GRAMMAR_TITLES[lessonId];
             const pdfPath = `./grammar-docs/${lessonId}.pdf`;
 
-            fetch(pdfPath, { method: "HEAD" })
-                .then((res) => {
-                    if (res.ok) {
-                        pdfViewer.src = pdfPath;
-                    } else {
-                        pdfViewer.style.display = "none";
-                        emptyNotice.classList.add("show");
-                    }
-                })
-                .catch(() => {
-                    pdfViewer.src = pdfPath;
-                });
+            loadPdf(pdfPath);
         } else {
-            pdfViewer.style.display = "none";
+            showEmpty();
+        }
+
+        async function loadPdf(url) {
+            try {
+                const loadingTask = pdfjsLib.getDocument(url);
+                const pdf = await loadingTask.promise;
+                
+                loadingText.remove();
+
+                // Lần lượt render toàn bộ trang từ trang 1 đến trang cuối
+                for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+                    const page = await pdf.getPage(pageNum);
+                    
+                    // Tính tỉ lệ nét cao (2.0) giúp chữ trên màn hình điện thoại sắc nét
+                    const scale = 2.0;
+                    const viewport = page.getViewport({ scale });
+
+                    const canvas = document.createElement("canvas");
+                    canvas.className = "pdf-page-canvas";
+                    canvas.height = viewport.height;
+                    canvas.width = viewport.width;
+
+                    const renderContext = {
+                        canvasContext: canvas.getContext("2d"),
+                        viewport: viewport
+                    };
+
+                    await page.render(renderContext).promise;
+                    viewerContainer.appendChild(canvas);
+                }
+            } catch (err) {
+                showEmpty();
+            }
+        }
+
+        function showEmpty() {
+            if (loadingText) loadingText.remove();
             emptyNotice.classList.add("show");
         }
     </script>
