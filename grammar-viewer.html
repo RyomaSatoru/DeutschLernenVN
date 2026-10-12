@@ -21,7 +21,7 @@
             --primary-hover: #16213e;
             --primary-soft: #e8edf7;
             --header-bg: rgba(255, 255, 255, 0.85);
-            --pdf-bg: #525659;
+            --pdf-bg: #eef1f8;
         }
         html[data-theme="dark"] {
             --bg: #0f1424;
@@ -33,7 +33,7 @@
             --primary-hover: #4d83cf;
             --primary-soft: #232c44;
             --header-bg: rgba(20, 26, 44, 0.85);
-            --pdf-bg: #1e222d;
+            --pdf-bg: #0a0d18;
         }
 
         * { box-sizing: border-box; }
@@ -73,6 +73,27 @@
         }
         .header-sub { font-size: 12px; color: var(--text-muted); }
 
+        /* Nút tải file */
+        .btn-download {
+            padding: 8px 14px;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            background: var(--card-bg);
+            color: var(--text);
+            font-size: 13.5px;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: inherit;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: background 0.2s, border-color 0.2s, transform 0.1s;
+            white-space: nowrap;
+        }
+        .btn-download:hover { background: var(--primary-soft); border-color: var(--primary); }
+        .btn-download:active { transform: scale(0.96); }
+
         /* ====== KHU VỰC HIỂN THỊ CÁC TRANG PDF ====== */
         main {
             max-width: 960px; width: 100%; margin: 0 auto;
@@ -98,13 +119,19 @@
             max-width: 100%;
             height: auto !important;
             box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
-            border-radius: 4px;
+            border-radius: 6px;
             background: #ffffff;
+            transition: filter 0.3s;
+        }
+
+        /* Đảo màu nền và chữ khi ở Dark Mode giống Google Docs ban đêm */
+        html[data-theme="dark"] .pdf-page-canvas {
+            filter: invert(0.92) hue-rotate(180deg) contrast(0.95);
         }
 
         /* Trạng thái tải / thông báo */
         .loading-text {
-            color: #ffffff;
+            color: var(--text-muted);
             font-size: 14px;
             margin: auto;
             text-align: center;
@@ -129,6 +156,7 @@
                 <div class="header-title" id="pageTitle">Tài liệu Ngữ pháp</div>
                 <div class="header-sub">Tóm tắt & Bài giảng chi tiết</div>
             </div>
+            <a class="btn-download" id="downloadBtn" download style="display: none;">📥 Tải về</a>
         </div>
     </header>
 
@@ -150,7 +178,6 @@
             document.documentElement.setAttribute("data-theme", saved);
         })();
 
-        // Cấu hình worker cho PDF.js
         pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
 
         const GRAMMAR_TITLES = {
@@ -210,6 +237,7 @@
         const viewerContainer = document.getElementById("viewerContainer");
         const loadingText = document.getElementById("loadingText");
         const emptyNotice = document.getElementById("emptyNotice");
+        const downloadBtn = document.getElementById("downloadBtn");
 
         if (lessonId && GRAMMAR_TITLES[lessonId]) {
             pageTitle.textContent = GRAMMAR_TITLES[lessonId];
@@ -227,11 +255,14 @@
                 
                 loadingText.remove();
 
-                // Lần lượt render toàn bộ trang từ trang 1 đến trang cuối
+                // Kích hoạt và gán link cho nút tải về
+                downloadBtn.href = url;
+                downloadBtn.setAttribute("download", `${lessonId}.pdf`);
+                downloadBtn.style.display = "inline-flex";
+
                 for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
                     const page = await pdf.getPage(pageNum);
                     
-                    // Tính tỉ lệ nét cao (2.0) giúp chữ trên màn hình điện thoại sắc nét
                     const scale = 2.0;
                     const viewport = page.getViewport({ scale });
 
@@ -255,6 +286,7 @@
 
         function showEmpty() {
             if (loadingText) loadingText.remove();
+            downloadBtn.style.display = "none";
             emptyNotice.classList.add("show");
         }
     </script>
